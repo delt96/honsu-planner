@@ -1,6 +1,6 @@
 import express from 'express';
 import * as items from '../queries/items.js';
-import { validateItemName } from '../validation.js';
+import { validateItemName, parseId } from '../validation.js';
 
 export function itemsRouter(pool) {
   const r = express.Router();
@@ -11,7 +11,9 @@ export function itemsRouter(pool) {
 
   r.get('/items/:id', async (req, res, next) => {
     try {
-      const item = await items.getItemWithCandidates(pool, Number(req.params.id));
+      const id = parseId(req.params.id);
+      if (id === null) return res.status(404).json({ error: 'Not found' });
+      const item = await items.getItemWithCandidates(pool, id);
       if (!item) return res.status(404).json({ error: 'Item not found' });
       res.json(item);
     } catch (e) { next(e); }
@@ -27,6 +29,8 @@ export function itemsRouter(pool) {
 
   r.patch('/items/:id', async (req, res, next) => {
     try {
+      const id = parseId(req.params.id);
+      if (id === null) return res.status(404).json({ error: 'Not found' });
       const data = {};
       if (req.body?.name !== undefined) {
         const err = validateItemName(req.body.name);
@@ -34,7 +38,7 @@ export function itemsRouter(pool) {
         data.name = req.body.name.trim();
       }
       if (req.body?.sort_order !== undefined) data.sort_order = Number(req.body.sort_order);
-      const updated = await items.updateItem(pool, Number(req.params.id), data);
+      const updated = await items.updateItem(pool, id, data);
       if (!updated) return res.status(404).json({ error: 'Item not found' });
       res.json(updated);
     } catch (e) { next(e); }
@@ -42,7 +46,9 @@ export function itemsRouter(pool) {
 
   r.delete('/items/:id', async (req, res, next) => {
     try {
-      const ok = await items.deleteItem(pool, Number(req.params.id));
+      const id = parseId(req.params.id);
+      if (id === null) return res.status(404).json({ error: 'Not found' });
+      const ok = await items.deleteItem(pool, id);
       if (!ok) return res.status(404).json({ error: 'Item not found' });
       res.status(204).end();
     } catch (e) { next(e); }
@@ -50,7 +56,8 @@ export function itemsRouter(pool) {
 
   r.put('/items/:id/confirm', async (req, res, next) => {
     try {
-      const itemId = Number(req.params.id);
+      const itemId = parseId(req.params.id);
+      if (itemId === null) return res.status(404).json({ error: 'Not found' });
       const candidateId = Number(req.body?.candidate_id);
       if (!Number.isInteger(candidateId)) {
         return res.status(400).json({ error: 'candidate_id is required' });
@@ -65,7 +72,9 @@ export function itemsRouter(pool) {
 
   r.delete('/items/:id/confirm', async (req, res, next) => {
     try {
-      const updated = await items.clearConfirmed(pool, Number(req.params.id));
+      const id = parseId(req.params.id);
+      if (id === null) return res.status(404).json({ error: 'Not found' });
+      const updated = await items.clearConfirmed(pool, id);
       if (!updated) return res.status(404).json({ error: 'Item not found' });
       res.json(updated);
     } catch (e) { next(e); }

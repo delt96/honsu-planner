@@ -58,3 +58,15 @@ test('DELETE candidate removes it', async () => {
   const item = await request(app).get(`/api/items/${id}`);
   expect(item.body.candidates).toHaveLength(0);
 });
+
+test('POST /api/items/abc/candidates returns 404 for non-numeric id', async () => {
+  const { app } = createTestApp();
+  const res = await request(app).post('/api/items/abc/candidates').send({ name: 'x' });
+  expect(res.status).toBe(404);
+});
+
+test('DELETE /api/candidates/abc returns 404 for non-numeric id', async () => {
+  const { app } = createTestApp();
+  const res = await request(app).delete('/api/candidates/abc');
+  expect(res.status).toBe(404);
+});

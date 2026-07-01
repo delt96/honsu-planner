@@ -49,3 +49,15 @@ test('DELETE /api/items/:id removes it', async () => {
   const res = await request(app).get(`/api/items/${created.body.id}`);
   expect(res.status).toBe(404);
 });
+
+test('GET /api/items/abc returns 404 for non-numeric id', async () => {
+  const { app } = createTestApp();
+  const res = await request(app).get('/api/items/abc');
+  expect(res.status).toBe(404);
+});
+
+test('DELETE /api/items/abc returns 404 for non-numeric id', async () => {
+  const { app } = createTestApp();
+  const res = await request(app).delete('/api/items/abc');
+  expect(res.status).toBe(404);
+});

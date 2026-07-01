@@ -1,3 +1,8 @@
+export function parseId(value) {
+  const n = Number(value);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
 export function validateItemName(name) {
   if (typeof name !== 'string' || name.trim() === '') return 'Name is required';
   if (name.trim().length > 100) return 'Name is too long';
