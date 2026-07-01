@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { vi, test, expect, beforeEach } from 'vitest';
@@ -67,4 +67,31 @@ test('remove calls api.unplaceItem', async () => {
   await screen.findByText('소파');
   await userEvent.click(screen.getByRole('button', { name: '제거' }));
   await waitFor(() => expect(api.unplaceItem).toHaveBeenCalledWith(5));
+});
+
+test('dragging a room persists the snapped new position', async () => {
+  api.getLayout.mockResolvedValue(LAYOUT);
+  api.updateRoom.mockResolvedValue({});
+  render(<MemoryRouter><LayoutPage /></MemoryRouter>);
+  const rect = await screen.findByTestId('room-1');
+  const svg = screen.getByRole('img', { name: '평면도' });
+  // move +40px in x → 40 / 0.4 = 100cm; room.x was 0 → 100
+  fireEvent.mouseDown(rect, { clientX: 0, clientY: 0 });
+  fireEvent.mouseMove(svg, { clientX: 40, clientY: 0 });
+  fireEvent.mouseUp(svg, { clientX: 40, clientY: 0 });
+  await waitFor(() => expect(api.updateRoom).toHaveBeenCalledWith(1, { x: 100, y: 0 }));
+});
+
+test('dragging furniture persists via placeItem keeping rotation', async () => {
+  api.getLayout.mockResolvedValue(LAYOUT);
+  api.placeItem.mockResolvedValue({});
+  render(<MemoryRouter><LayoutPage /></MemoryRouter>);
+  await screen.findByText('소파');
+  const rect = screen.getByTestId('furn-5');
+  const svg = screen.getByRole('img', { name: '평면도' });
+  // move +0px x, +40px y → +100cm y; placement was (10,20) rot 0 → (10, 120)
+  fireEvent.mouseDown(rect, { clientX: 0, clientY: 0 });
+  fireEvent.mouseMove(svg, { clientX: 0, clientY: 40 });
+  fireEvent.mouseUp(svg, { clientX: 0, clientY: 40 });
+  await waitFor(() => expect(api.placeItem).toHaveBeenCalledWith(5, { x: 10, y: 120, rotation: 0 }));
 });

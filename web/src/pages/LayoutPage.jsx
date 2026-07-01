@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
-import { cmToPx, rotatedFootprint, nextRotation } from '../geometry.js';
+import { cmToPx, pxToCm, snapCm, rotatedFootprint, nextRotation } from '../geometry.js';
 
 const MARGIN_CM = 50;
 
@@ -24,6 +24,37 @@ export function LayoutPage() {
   const [layout, setLayout] = useState(null);
   const [error, setError] = useState(null);
   const [room, setRoom] = useState({ name: '', width_cm: '', depth_cm: '' });
+  const [drag, setDrag] = useState(null); // { kind:'room'|'item', id, startX, startY, dxCm, dyCm }
+
+  function startDrag(kind, id, e) {
+    e.preventDefault();
+    setDrag({ kind, id, startX: e.clientX, startY: e.clientY, dxCm: 0, dyCm: 0 });
+  }
+  function moveDrag(e) {
+    setDrag((d) => (d ? { ...d, dxCm: pxToCm(e.clientX - d.startX), dyCm: pxToCm(e.clientY - d.startY) } : d));
+  }
+  async function endDrag(e) {
+    if (!drag) return;
+    const ddx = snapCm(pxToCm(e.clientX - drag.startX));
+    const ddy = snapCm(pxToCm(e.clientY - drag.startY));
+    const d = drag;
+    setDrag(null);
+    if (ddx === 0 && ddy === 0) return;
+    try {
+      if (d.kind === 'room') {
+        const r = layout.rooms.find((r) => r.id === d.id);
+        await api.updateRoom(d.id, { x: r.x + ddx, y: r.y + ddy });
+      } else {
+        const p = layout.placements.find((p) => p.item_id === d.id);
+        await api.placeItem(d.id, { x: p.x + ddx, y: p.y + ddy, rotation: p.rotation });
+      }
+      await load();
+    } catch (err) { setError(err.message); }
+  }
+  const liveOffset = (kind, id) =>
+    drag && drag.kind === kind && drag.id === id
+      ? { dx: cmToPx(drag.dxCm), dy: cmToPx(drag.dyCm) }
+      : { dx: 0, dy: 0 };
 
   async function load() {
     try { setLayout(await api.getLayout()); } catch (e) { setError(e.message); }
@@ -75,21 +106,29 @@ export function LayoutPage() {
           viewBox={`0 0 ${cmToPx(ext.w)} ${cmToPx(ext.h)}`}
           role="img"
           aria-label="평면도"
+          onMouseMove={moveDrag}
+          onMouseUp={endDrag}
         >
-          {rooms.map((r) => (
-            <g key={`room-${r.id}`}>
-              <rect className="room" data-testid={`room-${r.id}`}
-                x={cmToPx(r.x)} y={cmToPx(r.y)} width={cmToPx(r.width_cm)} height={cmToPx(r.depth_cm)} />
-              <text x={cmToPx(r.x) + 4} y={cmToPx(r.y) + 14} className="room-label">
-                {r.name} ({r.width_cm}×{r.depth_cm})
-              </text>
-            </g>
-          ))}
+          {rooms.map((r) => {
+            const off = liveOffset('room', r.id);
+            return (
+              <g key={`room-${r.id}`} transform={`translate(${off.dx} ${off.dy})`}>
+                <rect className="room" data-testid={`room-${r.id}`}
+                  onMouseDown={(e) => startDrag('room', r.id, e)}
+                  x={cmToPx(r.x)} y={cmToPx(r.y)} width={cmToPx(r.width_cm)} height={cmToPx(r.depth_cm)} />
+                <text x={cmToPx(r.x) + 4} y={cmToPx(r.y) + 14} className="room-label">
+                  {r.name} ({r.width_cm}×{r.depth_cm})
+                </text>
+              </g>
+            );
+          })}
           {placements.map((p) => {
             const f = rotatedFootprint(p.width_cm, p.depth_cm, p.rotation);
+            const off = liveOffset('item', p.item_id);
             return (
-              <g key={`item-${p.item_id}`}>
+              <g key={`item-${p.item_id}`} transform={`translate(${off.dx} ${off.dy})`}>
                 <rect className="furniture" data-testid={`furn-${p.item_id}`}
+                  onMouseDown={(e) => startDrag('item', p.item_id, e)}
                   x={cmToPx(p.x)} y={cmToPx(p.y)} width={cmToPx(f.w)} height={cmToPx(f.h)} />
                 <text x={cmToPx(p.x) + 4} y={cmToPx(p.y) + 14} className="furn-label">{p.name}</text>
               </g>
