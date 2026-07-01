@@ -9,6 +9,18 @@ export function validateItemName(name) {
   return null;
 }
 
+export const ITEM_CATEGORIES = ['appliance', 'furniture'];
+
+// Returns the normalized category (string | null) or an Error message string.
+// Accepts undefined/null/'' as null (uncategorized); otherwise must be a known category.
+export function normalizeCategory(value) {
+  if (value === undefined || value === null || value === '') return { value: null };
+  if (typeof value !== 'string' || !ITEM_CATEGORIES.includes(value)) {
+    return { error: `category must be one of ${ITEM_CATEGORIES.join(', ')}` };
+  }
+  return { value };
+}
+
 export function normalizeCandidate(body, { partial = false } = {}) {
   const out = {};
   const errors = [];

@@ -1,4 +1,4 @@
-export const PX_PER_CM = 0.4;
+export const PX_PER_CM = 0.6;
 export const GRID_CM = 10;
 
 export const cmToPx = (cm) => cm * PX_PER_CM;

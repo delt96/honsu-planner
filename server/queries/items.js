@@ -1,6 +1,6 @@
 export async function listItems(pool) {
   const { rows } = await pool.query(
-    `SELECT i.id, i.name, i.sort_order, i.confirmed_candidate_id, i.created_at,
+    `SELECT i.id, i.name, i.category, i.sort_order, i.confirmed_candidate_id, i.created_at,
             c.name AS confirmed_name, c.price AS confirmed_price
      FROM items i
      LEFT JOIN candidates c ON c.id = i.confirmed_candidate_id
@@ -28,10 +28,10 @@ export async function getItemWithCandidates(pool, id) {
   return { ...item, candidates: rows.map(normalizeCandidateRow) };
 }
 
-export async function createItem(pool, { name }) {
+export async function createItem(pool, { name, category = null }) {
   const { rows } = await pool.query(
-    'INSERT INTO items (name) VALUES ($1) RETURNING *',
-    [name]
+    'INSERT INTO items (name, category) VALUES ($1, $2) RETURNING *',
+    [name, category]
   );
   return rows[0];
 }
@@ -41,6 +41,7 @@ export async function updateItem(pool, id, data) {
   const vals = [];
   let i = 1;
   if ('name' in data) { sets.push(`name = $${i++}`); vals.push(data.name); }
+  if ('category' in data) { sets.push(`category = $${i++}`); vals.push(data.category); }
   if ('sort_order' in data) { sets.push(`sort_order = $${i++}`); vals.push(data.sort_order); }
   if (sets.length === 0) return getItem(pool, id);
   vals.push(id);

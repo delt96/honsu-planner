@@ -1,6 +1,6 @@
 import express from 'express';
 import * as items from '../queries/items.js';
-import { validateItemName, parseId } from '../validation.js';
+import { validateItemName, parseId, normalizeCategory } from '../validation.js';
 
 export function itemsRouter(pool) {
   const r = express.Router();
@@ -23,7 +23,11 @@ export function itemsRouter(pool) {
     try {
       const err = validateItemName(req.body?.name);
       if (err) return res.status(400).json({ error: err });
-      res.status(201).json(await items.createItem(pool, { name: req.body.name.trim() }));
+      const cat = normalizeCategory(req.body?.category);
+      if (cat.error) return res.status(400).json({ error: cat.error });
+      res.status(201).json(
+        await items.createItem(pool, { name: req.body.name.trim(), category: cat.value })
+      );
     } catch (e) { next(e); }
   });
 
@@ -36,6 +40,11 @@ export function itemsRouter(pool) {
         const err = validateItemName(req.body.name);
         if (err) return res.status(400).json({ error: err });
         data.name = req.body.name.trim();
+      }
+      if (req.body?.category !== undefined) {
+        const cat = normalizeCategory(req.body.category);
+        if (cat.error) return res.status(400).json({ error: cat.error });
+        data.category = cat.value;
       }
       if (req.body?.sort_order !== undefined) data.sort_order = Number(req.body.sort_order);
       const updated = await items.updateItem(pool, id, data);

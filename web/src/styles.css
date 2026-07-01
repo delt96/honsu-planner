@@ -1,216 +1,268 @@
-/* honsu-planner design system — warm home/wedding, Soft UI Evolution
-   Palette: interior warm-stone neutrals + cream bg; rose brand; gold "confirmed".
-   Font: Plus Jakarta Sans (loaded in index.html). */
+/* honsu-planner — "Elegant" direction: ivory paper, deep-green ink, burgundy brand,
+   champagne gold accent. Serif display (Playfair + Noto Serif KR) over a clean native
+   Korean sans body. Signature: the floor plan as an architectural drawing. */
 
 :root {
   color-scheme: light;
 
-  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: 'Playfair Display', 'Noto Serif KR', Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic',
+    'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 
-  /* neutrals (warm stone) */
-  --bg: #faf5f2;
-  --surface: #ffffff;
-  --surface-2: #fbf7f4;
-  --text: #1c1917;
-  --text-muted: #78716c;
-  --text-soft: #a8a29e;
-  --border: #ece5df;
-  --border-strong: #ddd3ca;
+  /* surfaces */
+  --paper: #f6f3ee;
+  --surface: #fffdf9;
+  --surface-2: #f3efe7;
 
-  /* brand (rose) + confirmed (gold) + danger */
-  --primary: #db2777;
-  --primary-hover: #be185d;
-  --primary-text: #be185d; /* AA-contrast rose for text/links */
-  --primary-soft: #fce7f0;
-  --primary-ring: rgba(219, 39, 119, 0.32);
+  /* ink (deep green) */
+  --ink: #1f2a24;
+  --ink-soft: #55605a;
+  --ink-faint: #8b958e;
 
-  --gold: #b45309;
-  --gold-soft: #fdf1e3;
-  --gold-border: #f3d9b6;
+  /* lines */
+  --line: #e5ded2;
+  --line-strong: #d6ccba;
+  --gold-line: #e2d0ac;
 
-  --danger: #dc2626;
-  --danger-hover: #b91c1c;
-  --danger-soft: #fdecec;
-  --danger-border: #f6cccc;
+  /* brand + accents */
+  --brand: #7b2d3b; /* burgundy */
+  --brand-hover: #5e1f2c;
+  --gold: #b08d57; /* champagne — borders/large only */
+  --gold-ink: #8a6a37; /* AA text gold */
+  --gold-soft: #f4ecdd;
 
-  --radius: 14px;
-  --radius-sm: 10px;
+  --appliance: #35625c; /* steel teal */
+  --furniture: #8a4b42; /* rosewood */
+
+  --danger: #a8342b;
+  --danger-soft: #f6e7e4;
+  --danger-line: #e6c6c0;
+
+  --ring: rgba(123, 45, 59, 0.3);
+
+  --radius: 12px;
+  --radius-sm: 9px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
-  --shadow: 0 1px 2px rgba(28, 25, 23, 0.04), 0 6px 18px rgba(28, 25, 23, 0.06);
-  --shadow-md: 0 10px 30px rgba(28, 25, 23, 0.1);
+  --shadow-sm: 0 1px 2px rgba(31, 42, 36, 0.05);
+  --shadow: 0 1px 2px rgba(31, 42, 36, 0.04), 0 8px 22px rgba(31, 42, 36, 0.07);
 
   --t: 180ms cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 
 * { box-sizing: border-box; }
-
 html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  font-family: var(--font);
-  color: var(--text);
-  background: var(--bg);
-  line-height: 1.55;
+  font-family: var(--sans);
+  color: var(--ink);
+  background-color: var(--paper);
+  /* faint paper grain via layered radial dots */
+  background-image: radial-gradient(rgba(176, 141, 87, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-.container {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 28px 20px 64px;
-}
+.container { max-width: 1040px; margin: 0 auto; padding: 30px 22px 72px; }
 
-/* ---------- typography ---------- */
-h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 4px 0 14px;
-}
-h2 {
-  font-size: 1.05rem;
+/* ---------- header / display type ---------- */
+.page-head { margin-bottom: 20px; }
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
 }
-
-/* ---------- links ---------- */
-a { color: var(--primary-text); }
-
-/* back link "← 목록" and nav link sit directly in .container */
-.container > a[href],
-.nav a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.92rem;
+h1.display,
+.display {
+  font-family: var(--serif);
   font-weight: 600;
-  color: var(--text-muted);
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+h1.display { font-size: 2.1rem; margin: 0; line-height: 1.15; }
+
+/* back link "← 목록" sits directly in .container */
+.container > a[href] {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
   text-decoration: none;
   transition: color var(--t);
 }
-.container > a[href]:hover,
-.nav a:hover { color: var(--primary-text); }
+.container > a[href]:hover { color: var(--brand); }
 
-.nav { margin: 2px 0 18px; }
-.nav a { color: var(--primary-text); }
+.nav { margin: 10px 0 0; }
+.nav a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-line);
+  padding-bottom: 1px;
+  transition: color var(--t), border-color var(--t);
+}
+.nav a:hover { color: var(--brand-hover); border-color: var(--brand); }
 
-/* ---------- summary (home stat bar) ---------- */
+/* ---------- summary ---------- */
 .summary {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  background: linear-gradient(180deg, #fff, var(--surface-2));
-  border: 1px solid var(--border);
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--gold);
   border-radius: var(--radius);
-  padding: 18px 20px;
-  margin: 14px 0 22px;
+  padding: 20px 22px;
+  margin: 18px 0 26px;
   box-shadow: var(--shadow-sm);
-  color: var(--text-muted);
-  font-size: 0.95rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 2px 14px;
+}
+.summary-label {
+  grid-row: 1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 .summary strong {
-  color: var(--gold);
-  font-size: 1.5rem;
+  grid-row: 2;
+  grid-column: 1;
+  font-family: var(--serif);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 2.2rem;
+  line-height: 1.1;
+  color: var(--brand);
   font-variant-numeric: tabular-nums;
-  margin: 0 2px;
+  white-space: nowrap;
+}
+.summary-sub {
+  grid-row: 2;
+  grid-column: 2;
+  align-self: flex-end;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
 }
 
 /* ---------- buttons ---------- */
 button {
   font: inherit;
   font-weight: 600;
-  padding: 10px 16px;
+  padding: 9px 16px;
   min-height: 40px;
-  border: 1px solid transparent;
+  border: 1px solid var(--brand);
   border-radius: var(--radius-sm);
-  background: var(--primary);
+  background: var(--brand);
   color: #fff;
   cursor: pointer;
-  transition: background var(--t), border-color var(--t), transform var(--t), box-shadow var(--t);
-  box-shadow: var(--shadow-sm);
+  transition: background var(--t), border-color var(--t), color var(--t), transform var(--t);
 }
-button:hover { background: var(--primary-hover); }
+button:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
 button:active { transform: translateY(1px); }
 
-/* danger (삭제 / 제거) — soft, outlined */
 button.danger {
-  background: var(--danger-soft);
+  background: transparent;
   color: var(--danger);
-  border-color: var(--danger-border);
-  box-shadow: none;
-  padding: 7px 12px;
-  min-height: 34px;
-}
-button.danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-
-/* confirm area actions ("이걸로 확정" / "확정 해제") — gold "select" style */
-.cand-actions button:not(.danger) {
-  background: var(--gold-soft);
-  color: var(--gold);
-  border-color: var(--gold-border);
-  box-shadow: none;
-}
-.cand-actions button:not(.danger):hover { background: var(--gold); color: #fff; border-color: var(--gold); }
-
-/* in-panel secondary actions ("배치" / "회전") — neutral ghost */
-.mini-list button:not(.danger) {
-  background: var(--surface);
-  color: var(--text);
-  border-color: var(--border-strong);
-  box-shadow: none;
+  border-color: var(--danger-line);
   padding: 6px 12px;
   min-height: 32px;
 }
-.mini-list button:not(.danger):hover { background: var(--surface-2); border-color: var(--text-soft); }
+button.danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
-/* ---------- inputs / forms ---------- */
-.add-row,
-.cand-form,
-.room-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 14px 0;
+/* confirm actions ("이걸로 확정" / "확정 해제") — gold */
+.cand-actions button:not(.danger) {
+  background: transparent;
+  color: var(--gold-ink);
+  border-color: var(--gold-line);
 }
-.cand-form { margin-top: 22px; }
-.cand-form h2,
-.panel h2 { width: 100%; margin: 6px 0 4px; }
+.cand-actions button:not(.danger):hover { background: var(--gold-ink); color: #fff; border-color: var(--gold-ink); }
 
-input {
+/* in-panel secondary ("배치" / "회전") — quiet ghost */
+.mini-list button:not(.danger) {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line-strong);
+  padding: 6px 12px;
+  min-height: 32px;
+}
+.mini-list button:not(.danger):hover { background: var(--surface-2); border-color: var(--ink-faint); }
+
+/* ---------- inputs / selects / forms ---------- */
+.add-row, .cand-form, .room-form {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0;
+}
+.cand-form { margin-top: 24px; }
+.cand-form h2, .panel h2 { width: 100%; }
+
+input, select {
   font: inherit;
-  flex: 1 1 160px;
+  flex: 1 1 150px;
   padding: 10px 12px;
   min-height: 42px;
-  color: var(--text);
+  color: var(--ink);
   background: var(--surface);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   transition: border-color var(--t), box-shadow var(--t);
 }
-input::placeholder { color: var(--text-soft); }
-input:hover { border-color: var(--text-soft); }
+select { flex: 0 0 auto; min-width: 96px; cursor: pointer; }
+input::placeholder { color: var(--ink-faint); }
+input:hover, select:hover { border-color: var(--ink-faint); }
 .room-form input { flex: 1 1 100px; }
 
-/* ---------- home: item list ---------- */
-.item-list,
-.candidate-list { list-style: none; padding: 0; margin: 0; }
+.empty {
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-align: center;
+}
 
+/* ---------- item groups (home) ---------- */
+.item-group { margin: 22px 0; }
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--gold-line);
+}
+.group-title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink);
+}
+.group-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.item-list, .candidate-list { list-style: none; padding: 0; margin: 0; }
 .item-list li { margin-bottom: 10px; }
 .item-list li a {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding: 16px 18px;
+  padding: 15px 18px;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   text-decoration: none;
   color: inherit;
@@ -220,34 +272,37 @@ input:hover { border-color: var(--text-soft); }
 .item-list li a:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow);
-  border-color: var(--border-strong);
+  border-color: var(--line-strong);
 }
+.item-main { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.cat-mark { display: inline-flex; align-items: center; flex: none; }
 .item-name { font-weight: 600; letter-spacing: -0.01em; }
 
 /* ---------- badges ---------- */
 .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  display: inline-flex; align-items: center; gap: 5px;
   padding: 5px 11px;
   border-radius: var(--radius-pill);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-size: 0.8rem; font-weight: 600;
+  color: var(--ink-soft);
   background: var(--surface-2);
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-.badge.confirmed {
-  color: var(--gold);
-  background: var(--gold-soft);
-  border-color: var(--gold-border);
-}
+.badge.confirmed { color: var(--gold-ink); background: var(--gold-soft); border-color: var(--gold-line); }
 
-/* ---------- item detail: candidate cards ---------- */
+/* ---------- item detail ---------- */
+.detail-head {
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  margin: 6px 0 4px;
+}
+.detail-head h1.display { font-size: 1.7rem; }
+.cat-select { display: inline-flex; align-items: center; gap: 7px; }
+.cat-select select { min-height: 36px; padding: 6px 10px; }
+
 .candidate-list li {
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 16px 18px;
   margin-bottom: 12px;
@@ -255,44 +310,25 @@ input:hover { border-color: var(--text-soft); }
   box-shadow: var(--shadow-sm);
 }
 .candidate-list li.confirmed {
-  border-color: var(--gold-border);
-  background: linear-gradient(180deg, var(--gold-soft), #fff);
+  border-color: var(--gold-line);
+  background: linear-gradient(180deg, var(--gold-soft), var(--surface));
   box-shadow: var(--shadow);
 }
-.cand-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-.cand-price {
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.candidate-list li.confirmed .cand-price { color: var(--gold); }
+.cand-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 700; }
+.cand-name { letter-spacing: -0.01em; }
+.cand-price { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.candidate-list li.confirmed .cand-price { color: var(--gold-ink); }
 .candidate-list li a[href] {
-  display: inline-block;
-  margin: 6px 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--primary-text);
+  display: inline-block; margin: 6px 0; font-size: 0.9rem; font-weight: 600; color: var(--brand);
 }
 .cand-actions { display: flex; gap: 8px; margin-top: 12px; }
-.dims,
-.memo {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin: 4px 0;
-}
+.dims, .memo { color: var(--ink-soft); font-size: 0.9rem; margin: 4px 0; }
 .dims { font-variant-numeric: tabular-nums; }
 
 .error {
   color: var(--danger);
   background: var(--danger-soft);
-  border: 1px solid var(--danger-border);
+  border: 1px solid var(--danger-line);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 0.92rem;
@@ -300,134 +336,119 @@ input:hover { border-color: var(--text-soft); }
 }
 
 /* ---------- floor plan ---------- */
-.layout-grid {
-  display: flex;
-  gap: 22px;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  margin-top: 8px;
+.layout-grid { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; margin-top: 4px; }
+.canvas-wrap { flex: 1 1 520px; min-width: 300px; }
+
+.legend {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 10px;
+  font-size: 0.82rem; font-weight: 600;
 }
+.legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.legend-hint { margin-left: auto; color: var(--ink-faint); font-weight: 500; }
 
 .canvas {
-  border: 1px solid var(--border-strong);
+  display: block;
+  border: 1px solid var(--gold-line);
   border-radius: var(--radius);
   background-color: var(--surface);
+  /* blueprint grid in champagne gold */
   background-image:
-    linear-gradient(rgba(120, 113, 108, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 113, 108, 0.09) 1px, transparent 1px);
-  background-size: 16px 16px;
+    linear-gradient(rgba(176, 141, 87, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(176, 141, 87, 0.16) 1px, transparent 1px);
+  background-size: 30px 30px; /* 50cm at 0.6 px/cm */
   box-shadow: var(--shadow);
   max-width: 100%;
-  height: auto;
   touch-action: none;
 }
 
-/* rooms: calm neutral structure */
 .room {
-  fill: rgba(120, 113, 108, 0.06);
-  stroke: var(--border-strong);
+  fill: rgba(31, 42, 36, 0.03);
+  stroke: var(--ink-soft);
   stroke-width: 1.5;
   cursor: grab;
   transition: fill var(--t);
 }
-.room:hover { fill: rgba(120, 113, 108, 0.12); }
-.room-label {
-  font-size: 11px;
-  font-weight: 600;
-  fill: var(--text-muted);
-}
+.room:hover { fill: rgba(31, 42, 36, 0.07); }
+.room-label { font-family: var(--serif); font-size: 12px; font-weight: 600; fill: var(--ink); }
 
-/* furniture: brand rose, pops against neutral rooms */
-.furniture {
-  fill: rgba(219, 39, 119, 0.16);
-  stroke: var(--primary);
-  stroke-width: 1.5;
-  cursor: grab;
-  transition: fill var(--t);
-}
-.furniture:hover { fill: rgba(219, 39, 119, 0.28); }
+.furniture { stroke-width: 1.75; cursor: grab; transition: fill var(--t), opacity var(--t); }
 .furniture:active { cursor: grabbing; }
-.furn-label {
-  font-size: 11px;
-  font-weight: 700;
-  fill: var(--primary-hover);
-}
+.furniture[data-cat='appliance'] { fill: rgba(53, 98, 92, 0.2); stroke: var(--appliance); }
+.furniture[data-cat='appliance']:hover { fill: rgba(53, 98, 92, 0.34); }
+.furniture[data-cat='furniture'] { fill: rgba(138, 75, 66, 0.2); stroke: var(--furniture); }
+.furniture[data-cat='furniture']:hover { fill: rgba(138, 75, 66, 0.34); }
+.furniture[data-cat='uncategorized'] { fill: rgba(138, 106, 55, 0.2); stroke: var(--gold-ink); }
+.furniture[data-cat='uncategorized']:hover { fill: rgba(138, 106, 55, 0.34); }
+.furn-label { font-size: 11px; font-weight: 700; fill: var(--ink); }
 
-/* white halo so SVG labels stay readable over shapes/grid */
-.room-label,
-.furn-label {
+/* white halo keeps SVG labels legible over shapes + grid */
+.room-label, .furn-label {
   paint-order: stroke;
-  stroke: rgba(255, 255, 255, 0.9);
+  stroke: rgba(255, 253, 249, 0.92);
   stroke-width: 3px;
   stroke-linejoin: round;
 }
 
+.scalebar line { stroke: var(--ink-soft); stroke-width: 1; }
+.scalebar text { font-size: 10px; fill: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.canvas-empty { font-family: var(--serif); font-size: 15px; fill: var(--ink-faint); font-style: italic; }
+
 /* control panel */
-.panel {
-  flex: 1 1 300px;
-  min-width: 260px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
+.panel { flex: 0 1 320px; min-width: 260px; display: flex; flex-direction: column; gap: 16px; }
 .panel section {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 16px 18px;
+  padding: 15px 17px;
   box-shadow: var(--shadow-sm);
 }
 .panel h2 {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-soft);
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
   margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gold-line);
 }
 
 .mini-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; }
 .mini-list li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
   padding: 8px 6px;
   border-radius: var(--radius-sm);
   flex-wrap: wrap;
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   transition: background var(--t);
 }
 .mini-list li:hover { background: var(--surface-2); }
-/* push action buttons to the right of each row */
+.mini-name { flex: 1 1 auto; min-width: 0; font-variant-numeric: tabular-nums; }
 .mini-list li > button { margin-left: auto; }
 .mini-list li > button ~ button { margin-left: 6px; }
-.mini-list a { font-weight: 600; text-decoration: none; }
+.mini-list a { flex: 1 1 auto; font-weight: 600; color: var(--brand); text-decoration: none; }
 .mini-list a:hover { text-decoration: underline; }
-.mini-list .muted {
-  color: var(--text-soft);
-  font-size: 0.9rem;
-  padding: 6px;
-}
+.mini-list .muted { color: var(--ink-faint); font-size: 0.88rem; padding: 6px; }
 .mini-list li.muted:hover { background: transparent; }
 
 /* ---------- accessibility ---------- */
-:where(a, button, input):focus-visible {
+:where(a, button, input, select):focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--primary-ring);
-  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+  border-color: var(--brand);
 }
-.room:focus-visible,
-.furniture:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.room:focus-visible, .furniture:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
 /* ---------- responsive ---------- */
-@media (max-width: 640px) {
-  .container { padding: 20px 14px 56px; }
-  h1 { font-size: 1.4rem; }
-  .summary strong { font-size: 1.3rem; }
-  input { min-height: 44px; } /* comfortable touch target on mobile */
-  .layout-grid { gap: 16px; }
+@media (max-width: 680px) {
+  .container { padding: 22px 15px 60px; }
+  h1.display { font-size: 1.7rem; }
+  .summary strong { font-size: 1.85rem; }
+  input, select { min-height: 44px; }
+  .canvas-wrap { flex-basis: 100%; }
   .panel { flex-basis: 100%; }
 }

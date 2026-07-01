@@ -3,7 +3,7 @@ import { listRooms } from './rooms.js';
 export async function getLayout(pool) {
   const rooms = await listRooms(pool);
   const { rows } = await pool.query(
-    `SELECT i.id AS item_id, i.name,
+    `SELECT i.id AS item_id, i.name, i.category,
             c.width_cm, c.depth_cm,
             p.x, p.y, p.rotation
      FROM items i
@@ -20,11 +20,12 @@ export async function getLayout(pool) {
     const w = row.width_cm === null ? null : Number(row.width_cm);
     const d = row.depth_cm === null ? null : Number(row.depth_cm);
     if (w === null || d === null) {
-      unplaceable.push({ item_id: row.item_id, name: row.name });
+      unplaceable.push({ item_id: row.item_id, name: row.name, category: row.category ?? null });
     } else if (row.x !== null && row.x !== undefined) {
       placements.push({
         item_id: row.item_id,
         name: row.name,
+        category: row.category ?? null,
         x: Number(row.x),
         y: Number(row.y),
         rotation: Number(row.rotation),
@@ -32,7 +33,13 @@ export async function getLayout(pool) {
         depth_cm: d,
       });
     } else {
-      palette.push({ item_id: row.item_id, name: row.name, width_cm: w, depth_cm: d });
+      palette.push({
+        item_id: row.item_id,
+        name: row.name,
+        category: row.category ?? null,
+        width_cm: w,
+        depth_cm: d,
+      });
     }
   }
 

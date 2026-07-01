@@ -18,7 +18,8 @@ export const api = {
   getSummary: () => req('/summary'),
   listItems: () => req('/items'),
   getItem: (id) => req(`/items/${id}`),
-  createItem: (name) => req('/items', { method: 'POST', body: JSON.stringify({ name }) }),
+  createItem: (name, category) =>
+    req('/items', { method: 'POST', body: JSON.stringify({ name, category }) }),
   updateItem: (id, data) => req(`/items/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteItem: (id) => req(`/items/${id}`, { method: 'DELETE' }),
   addCandidate: (itemId, data) =>

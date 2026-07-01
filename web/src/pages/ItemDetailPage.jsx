@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { won } from '../format.js';
+import { catKey, catColor } from '../categories.js';
+import { CategoryIcon } from '../icons.jsx';
 
 const EMPTY = { name: '', price: '', url: '', memo: '', width_cm: '', depth_cm: '', height_cm: '' };
 
@@ -32,6 +34,11 @@ export function ItemDetailPage() {
   async function removeCandidate(cid) {
     try { await api.deleteCandidate(cid); await load(); } catch (e) { setError(e.message); }
   }
+  async function changeCategory(e) {
+    const value = e.target.value;
+    try { await api.updateItem(itemId, { category: value }); await load(); }
+    catch (e) { setError(e.message); }
+  }
 
   if (!item) {
     return (
@@ -47,7 +54,19 @@ export function ItemDetailPage() {
   return (
     <main className="container">
       <Link to="/">← 목록</Link>
-      <h1>{item.name}</h1>
+      <div className="detail-head">
+        <h1 className="display">{item.name}</h1>
+        <label className="cat-select">
+          <span className="cat-mark" style={{ color: catColor(item.category) }}>
+            <CategoryIcon category={catKey(item.category)} size={16} />
+          </span>
+          <select aria-label="분류 변경" value={item.category ?? ''} onChange={changeCategory}>
+            <option value="">미분류</option>
+            <option value="appliance">가전</option>
+            <option value="furniture">가구</option>
+          </select>
+        </label>
+      </div>
       {error && <p className="error">{error}</p>}
       <ul className="candidate-list">
         {item.candidates.map((c) => {

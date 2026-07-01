@@ -14,9 +14,9 @@ vi.mock('../api.js', () => ({
 
 const LAYOUT = {
   rooms: [{ id: 1, name: '거실', x: 0, y: 0, width_cm: 400, depth_cm: 500 }],
-  placements: [{ item_id: 5, name: '소파', x: 10, y: 20, rotation: 0, width_cm: 200, depth_cm: 90 }],
-  palette: [{ item_id: 7, name: '식탁', width_cm: 120, depth_cm: 80 }],
-  unplaceable: [{ item_id: 9, name: '스탠드' }],
+  placements: [{ item_id: 5, name: '소파', category: 'furniture', x: 10, y: 20, rotation: 0, width_cm: 200, depth_cm: 90 }],
+  palette: [{ item_id: 7, name: '식탁', category: 'furniture', width_cm: 120, depth_cm: 80 }],
+  unplaceable: [{ item_id: 9, name: '스탠드', category: 'appliance' }],
 };
 
 beforeEach(() => { vi.clearAllMocks(); });
@@ -75,10 +75,10 @@ test('dragging a room persists the snapped new position', async () => {
   render(<MemoryRouter><LayoutPage /></MemoryRouter>);
   const rect = await screen.findByTestId('room-1');
   const svg = screen.getByRole('img', { name: '평면도' });
-  // move +40px in x → 40 / 0.4 = 100cm; room.x was 0 → 100
+  // move +60px in x → 60 / 0.6 = 100cm; room.x was 0 → 100
   fireEvent.mouseDown(rect, { clientX: 0, clientY: 0 });
-  fireEvent.mouseMove(svg, { clientX: 40, clientY: 0 });
-  fireEvent.mouseUp(svg, { clientX: 40, clientY: 0 });
+  fireEvent.mouseMove(svg, { clientX: 60, clientY: 0 });
+  fireEvent.mouseUp(svg, { clientX: 60, clientY: 0 });
   await waitFor(() => expect(api.updateRoom).toHaveBeenCalledWith(1, { x: 100, y: 0 }));
 });
 
@@ -89,9 +89,9 @@ test('dragging furniture persists via placeItem keeping rotation', async () => {
   await screen.findByText('소파');
   const rect = screen.getByTestId('furn-5');
   const svg = screen.getByRole('img', { name: '평면도' });
-  // move +0px x, +40px y → +100cm y; placement was (10,20) rot 0 → (10, 120)
+  // move +0px x, +60px y → +100cm y; placement was (10,20) rot 0 → (10, 120)
   fireEvent.mouseDown(rect, { clientX: 0, clientY: 0 });
-  fireEvent.mouseMove(svg, { clientX: 0, clientY: 40 });
-  fireEvent.mouseUp(svg, { clientX: 0, clientY: 40 });
+  fireEvent.mouseMove(svg, { clientX: 0, clientY: 60 });
+  fireEvent.mouseUp(svg, { clientX: 0, clientY: 60 });
   await waitFor(() => expect(api.placeItem).toHaveBeenCalledWith(5, { x: 10, y: 120, rotation: 0 }));
 });

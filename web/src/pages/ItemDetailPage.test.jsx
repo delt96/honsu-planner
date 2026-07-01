@@ -8,7 +8,7 @@ import { api } from '../api.js';
 vi.mock('../api.js', () => ({
   api: {
     getItem: vi.fn(), addCandidate: vi.fn(), confirm: vi.fn(),
-    unconfirm: vi.fn(), deleteCandidate: vi.fn(),
+    unconfirm: vi.fn(), deleteCandidate: vi.fn(), updateItem: vi.fn(),
   },
 }));
 

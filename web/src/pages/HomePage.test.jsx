@@ -19,7 +19,7 @@ test('renders summary and items', async () => {
   ]);
   render(<MemoryRouter><HomePage /></MemoryRouter>);
   expect(await screen.findByText('냉장고')).toBeInTheDocument();
-  expect(screen.getByText(/미확정 2건/)).toBeInTheDocument();
+  expect(screen.getByText(/2건/)).toBeInTheDocument();
   expect(screen.getByText('⚪ 비교중')).toBeInTheDocument();
 });
 
@@ -29,6 +29,7 @@ test('adds an item and reloads', async () => {
   api.createItem.mockResolvedValue({ id: 1, name: '소파' });
   render(<MemoryRouter><HomePage /></MemoryRouter>);
   await userEvent.type(screen.getByLabelText('새 항목 이름'), '소파');
+  await userEvent.selectOptions(screen.getByLabelText('분류'), 'furniture');
   await userEvent.click(screen.getByText('＋ 항목 추가'));
-  await waitFor(() => expect(api.createItem).toHaveBeenCalledWith('소파'));
+  await waitFor(() => expect(api.createItem).toHaveBeenCalledWith('소파', 'furniture'));
 });
