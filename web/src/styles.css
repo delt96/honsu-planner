@@ -20,3 +20,22 @@ button.danger { background: #c0392b; }
 .cand-head { display: flex; justify-content: space-between; font-weight: 600; }
 .cand-actions { display: flex; gap: 8px; margin-top: 8px; }
 .dims, .memo { color: #6b7280; font-size: 0.9rem; margin: 4px 0; }
+
+.nav { margin: 4px 0 12px; }
+.layout-grid { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.canvas { border: 1px solid #cbd5e1; background:
+  repeating-linear-gradient(0deg, #f8fafc, #f8fafc 3px, #eef2f7 4px),
+  repeating-linear-gradient(90deg, #f8fafc, #f8fafc 3px, #eef2f7 4px);
+  max-width: 100%; touch-action: none; }
+.panel { flex: 1 1 260px; min-width: 240px; }
+.panel section { margin-bottom: 16px; }
+.panel h2 { font-size: 1rem; margin: 8px 0; }
+.room { fill: rgba(37,99,235,0.06); stroke: #2563eb; stroke-width: 1; }
+.room-label { font-size: 11px; fill: #1e3a8a; }
+.furniture { fill: rgba(5,150,105,0.25); stroke: #059669; stroke-width: 1; cursor: move; }
+.furn-label { font-size: 11px; fill: #064e3b; }
+.mini-list { list-style: none; padding: 0; }
+.mini-list li { display: flex; align-items: center; gap: 6px; padding: 4px 0; flex-wrap: wrap; }
+.mini-list .muted { color: #9ca3af; }
+.room-form { display: flex; flex-wrap: wrap; gap: 6px; }
+.room-form input { flex: 1 1 90px; padding: 6px; border: 1px solid #ccc; border-radius: 6px; }
