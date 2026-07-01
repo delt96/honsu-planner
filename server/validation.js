@@ -96,6 +96,33 @@ export function normalizeRoomInput(body, { partial = false } = {}) {
   return { errors, value: out };
 }
 
+const HOME_SETTING_FIELDS = [
+  'door_width_cm',
+  'door_height_cm',
+  'elevator_door_width_cm',
+  'elevator_door_height_cm',
+  'elevator_car_width_cm',
+  'elevator_car_depth_cm',
+  'elevator_car_height_cm',
+];
+
+export function normalizeHomeSettings(body) {
+  const out = {};
+  const errors = [];
+  for (const key of HOME_SETTING_FIELDS) {
+    if (body[key] !== undefined) {
+      if (body[key] === null || body[key] === '') {
+        out[key] = null;
+      } else {
+        const n = Number(body[key]);
+        if (!(n > 0)) errors.push(`${key} must be a positive number`);
+        else out[key] = n;
+      }
+    }
+  }
+  return { errors, value: out };
+}
+
 export function normalizePlacementInput(body) {
   const out = {};
   const errors = [];

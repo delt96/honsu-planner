@@ -6,7 +6,7 @@ import { HomePage } from './HomePage.jsx';
 import { api } from '../api.js';
 
 vi.mock('../api.js', () => ({
-  api: { getSummary: vi.fn(), listItems: vi.fn(), createItem: vi.fn() },
+  api: { getSummary: vi.fn(), listItems: vi.fn(), createItem: vi.fn(), getHomeSettings: vi.fn() },
 }));
 
 beforeEach(() => { vi.clearAllMocks(); });

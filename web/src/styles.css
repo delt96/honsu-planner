@@ -329,3 +329,44 @@ h1.display { font-size: 22px; }
   .budget-pills { width: 100%; }
   .confirmed-price { min-width: 78px; }
 }
+
+/* ── 반입(carry-in) verdict badge ── */
+.carry-badge {
+  flex: none; display: inline-flex; align-items: center; gap: 5px;
+  font: 700 11px var(--sans); border-radius: var(--pill);
+  padding: 4px 9px; white-space: nowrap;
+}
+.carry-badge .carry-ico { font-size: 11px; line-height: 1; }
+.carry-badge .carry-reason { font-weight: 500; opacity: 0.85; }
+.carry-ok { color: var(--teal); background: var(--teal-soft2); }
+.carry-tight { color: var(--amber); background: var(--amber-soft2); }
+.carry-fail { color: var(--danger); background: var(--rose-soft); }
+.carry-unknown { color: var(--ink-3); background: var(--chip); }
+
+/* ── candidate edit ── */
+.btn-edit { color: var(--ink-2); background: var(--surface); border: 1px solid var(--line-2); }
+.btn-edit:hover { border-color: var(--ink-4); }
+.cand-edit {
+  margin-top: 12px; padding-top: 14px; border-top: 1px dashed var(--line-2);
+  display: flex; flex-wrap: wrap; gap: 9px;
+}
+.cand-edit input { flex: 1 1 130px; background: var(--surface-soft); min-height: 40px; padding: 9px 12px; border-radius: 10px; }
+.edit-actions { width: 100%; display: flex; gap: 8px; }
+.edit-actions button { min-height: 40px; border-radius: 10px; padding: 0 18px; font: 600 13px var(--sans); }
+.btn-ghost { color: var(--ink-2); background: var(--surface-soft); border: 1px solid var(--line-2); }
+.btn-ghost:hover { border-color: var(--ink-4); }
+
+/* ── 우리집 반입 정보 form ── */
+.carry-form { display: flex; flex-direction: column; gap: 12px; }
+.carry-group { border: 1px solid var(--line-2); border-radius: var(--r); padding: 10px 12px 12px; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.carry-group legend { font: 700 11.5px var(--sans); color: var(--ink-2); padding: 0 4px; }
+.carry-group input { flex: 1 1 80px; min-height: 38px; background: var(--surface-soft); padding: 8px 10px; border-radius: 9px; }
+.carry-form button { min-height: 42px; border-radius: 10px; padding: 10px 0; }
+.carry-hint { margin: 10px 0 0; font: 500 11.5px var(--sans); color: var(--ink-3); line-height: 1.5; }
+
+/* 반입 정보 page */
+.carry-page-form { background: var(--surface); border-radius: var(--r-xl); padding: 20px 22px; box-shadow: var(--sh-sm); gap: 14px; }
+.carry-page-form .carry-group input { flex: 1 1 120px; min-height: 44px; }
+.carry-actions { display: flex; align-items: center; gap: 12px; }
+.carry-actions button { flex: none; padding: 0 26px; }
+.carry-saved { font: 600 12.5px var(--sans); color: var(--teal); }

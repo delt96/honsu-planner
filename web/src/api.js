@@ -36,4 +36,6 @@ export const api = {
   deleteRoom: (id) => req(`/rooms/${id}`, { method: 'DELETE' }),
   placeItem: (itemId, data) => req(`/items/${itemId}/placement`, { method: 'PUT', body: JSON.stringify(data) }),
   unplaceItem: (itemId) => req(`/items/${itemId}/placement`, { method: 'DELETE' }),
+  getHomeSettings: () => req('/home-settings'),
+  saveHomeSettings: (data) => req('/home-settings', { method: 'PUT', body: JSON.stringify(data) }),
 };

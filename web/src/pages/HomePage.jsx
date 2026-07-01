@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { won } from '../format.js';
 import { catKey, catColor, catSoft, catLabel } from '../categories.js';
-import { CategoryIcon, BrandIcon } from '../icons.jsx';
+import { CategoryIcon } from '../icons.jsx';
+import { CarryInBadge } from '../CarryInBadge.jsx';
+import { Tabs } from '../Tabs.jsx';
 
 const TARGET_KEY = 'honsu_budget_target';
 const DEFAULT_TARGET = 15000000;
@@ -34,6 +36,7 @@ function IconSquare({ category, size = 20, big = false }) {
 export function HomePage() {
   const [summary, setSummary] = useState(null);
   const [items, setItems] = useState([]);
+  const [settings, setSettings] = useState(null);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('appliance');
   const [target, setTarget] = useState(loadTarget);
@@ -42,9 +45,10 @@ export function HomePage() {
 
   async function load() {
     try {
-      const [s, list] = await Promise.all([api.getSummary(), api.listItems()]);
+      const [s, list, hs] = await Promise.all([api.getSummary(), api.listItems(), api.getHomeSettings()]);
       setSummary(s);
       setItems(list);
+      setSettings(hs);
     } catch (e) { setError(e.message); }
   }
   useEffect(() => { load(); }, []);
@@ -76,16 +80,7 @@ export function HomePage() {
 
   return (
     <main className="container home">
-      <header className="brand-bar">
-        <div className="brand">
-          <span className="brand-mark"><BrandIcon size={18} /></span>
-          <span className="brand-name">우리집 혼수</span>
-        </div>
-        <nav className="tabs">
-          <span className="tab active">목록</span>
-          <Link to="/layout" className="tab">평면도</Link>
-        </nav>
-      </header>
+      <Tabs />
 
       {error && <p className="error">{error}</p>}
 
@@ -182,6 +177,11 @@ export function HomePage() {
                   {it.confirmed_name && <div className="confirmed-store">{it.confirmed_name}</div>}
                 </div>
                 {dimLabel(it) && <span className="dim-chip num">{dimLabel(it)}</span>}
+                <CarryInBadge
+                  dims={{ width_cm: it.confirmed_width_cm, depth_cm: it.confirmed_depth_cm, height_cm: it.confirmed_height_cm }}
+                  settings={settings}
+                  hideUnknown
+                />
                 <div className="confirmed-price num">{won(it.confirmed_price)}</div>
               </Link>
             ))}

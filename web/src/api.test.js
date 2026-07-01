@@ -41,3 +41,19 @@ test('createRoom POSTs to /api/rooms', async () => {
   await api.createRoom({ name: '거실', width_cm: 400, depth_cm: 500 });
   expect(global.fetch).toHaveBeenCalledWith('/api/rooms', expect.objectContaining({ method: 'POST' }));
 });
+
+test('getHomeSettings GETs /api/home-settings', async () => {
+  global.fetch.mockResolvedValue({ ok: true, status: 200, json: async () => ({ id: 1, door_width_cm: null }) });
+  const r = await api.getHomeSettings();
+  expect(global.fetch).toHaveBeenCalledWith('/api/home-settings', expect.objectContaining({}));
+  expect(r).toEqual({ id: 1, door_width_cm: null });
+});
+
+test('saveHomeSettings PUTs the settings body', async () => {
+  global.fetch.mockResolvedValue({ ok: true, status: 200, json: async () => ({ id: 1, door_width_cm: 90 }) });
+  await api.saveHomeSettings({ door_width_cm: 90 });
+  expect(global.fetch).toHaveBeenCalledWith(
+    '/api/home-settings',
+    expect.objectContaining({ method: 'PUT', body: JSON.stringify({ door_width_cm: 90 }) })
+  );
+});

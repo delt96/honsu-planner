@@ -9,6 +9,7 @@ vi.mock('../api.js', () => ({
   api: {
     getLayout: vi.fn(), createRoom: vi.fn(), deleteRoom: vi.fn(),
     placeItem: vi.fn(), unplaceItem: vi.fn(), updateRoom: vi.fn(),
+    getHomeSettings: vi.fn(), saveHomeSettings: vi.fn(),
   },
 }));
 

@@ -7,6 +7,7 @@ import { summaryRouter } from './routes/summary.js';
 import { roomsRouter } from './routes/rooms.js';
 import { placementsRouter } from './routes/placements.js';
 import { layoutRouter } from './routes/layout.js';
+import { homeSettingsRouter } from './routes/home-settings.js';
 
 export function createApp(pool) {
   const app = express();
@@ -20,6 +21,7 @@ export function createApp(pool) {
   app.use('/api', roomsRouter(pool));
   app.use('/api', placementsRouter(pool));
   app.use('/api', layoutRouter(pool));
+  app.use('/api', homeSettingsRouter(pool));
 
   const webDist = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'web', 'dist');
   app.use(express.static(webDist));

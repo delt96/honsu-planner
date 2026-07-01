@@ -4,20 +4,40 @@ import { api } from '../api.js';
 import { won } from '../format.js';
 import { catKey, catColor, catSoft, catLabel } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
+import { CarryInBadge } from '../CarryInBadge.jsx';
 
 const EMPTY = { name: '', price: '', url: '', memo: '', width_cm: '', depth_cm: '', height_cm: '' };
+
+function editValues(c) {
+  return {
+    name: c.name ?? '', price: c.price ?? '', url: c.url ?? '', memo: c.memo ?? '',
+    width_cm: c.width_cm ?? '', depth_cm: c.depth_cm ?? '', height_cm: c.height_cm ?? '',
+  };
+}
 
 export function ItemDetailPage() {
   const { id } = useParams();
   const itemId = Number(id);
   const [item, setItem] = useState(null);
+  const [settings, setSettings] = useState(null);
   const [form, setForm] = useState(EMPTY);
+  const [editId, setEditId] = useState(null);
+  const [editForm, setEditForm] = useState(EMPTY);
   const [error, setError] = useState(null);
 
   async function load() {
     try { setItem(await api.getItem(itemId)); } catch (e) { setError(e.message); }
   }
   useEffect(() => { load(); }, [itemId]);
+  useEffect(() => { Promise.resolve(api.getHomeSettings()).then(setSettings).catch(() => {}); }, []);
+
+  function startEdit(c) { setEditId(c.id); setEditForm(editValues(c)); }
+  function cancelEdit() { setEditId(null); setEditForm(EMPTY); }
+  async function saveEdit(e) {
+    e.preventDefault();
+    try { await api.updateCandidate(editId, editForm); cancelEdit(); await load(); }
+    catch (e) { setError(e.message); }
+  }
 
   async function addCandidate(e) {
     e.preventDefault();
@@ -49,6 +69,7 @@ export function ItemDetailPage() {
   }
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const setEdit = (k) => (e) => setEditForm({ ...editForm, [k]: e.target.value });
   const key = catKey(item.category);
 
   const priced = item.candidates.filter((c) => c.price != null);
@@ -127,6 +148,9 @@ export function ItemDetailPage() {
                 <span className={`cand-price num${isConfirmed ? ' price-conf' : ''}`}>{won(c.price)}</span>
               </div>
               {d && <div className="chip-row"><span className="spec-chip num">{d}</span></div>}
+              {isConfirmed && (
+                <div className="chip-row"><CarryInBadge dims={c} settings={settings} showReason /></div>
+              )}
               {c.memo && <p className="cand-memo">{c.memo}</p>}
               <div className="cand-actions">
                 {isConfirmed ? (
@@ -137,8 +161,24 @@ export function ItemDetailPage() {
                 {c.url && (
                   <a className="btn-link" href={c.url} target="_blank" rel="noreferrer">링크 ↗</a>
                 )}
+                <button className="btn-edit" onClick={() => startEdit(c)}>수정</button>
                 <button className="danger" onClick={() => removeCandidate(c.id)}>삭제</button>
               </div>
+              {editId === c.id && (
+                <form onSubmit={saveEdit} className="cand-edit">
+                  <input aria-label="수정 이름" placeholder="이름" value={editForm.name} onChange={setEdit('name')} />
+                  <input aria-label="수정 가격" placeholder="가격(원)" value={editForm.price} onChange={setEdit('price')} />
+                  <input aria-label="수정 URL" placeholder="URL" value={editForm.url} onChange={setEdit('url')} />
+                  <input aria-label="수정 메모" placeholder="메모" value={editForm.memo} onChange={setEdit('memo')} />
+                  <input aria-label="수정 가로" placeholder="가로(cm)" value={editForm.width_cm} onChange={setEdit('width_cm')} />
+                  <input aria-label="수정 세로" placeholder="세로(cm)" value={editForm.depth_cm} onChange={setEdit('depth_cm')} />
+                  <input aria-label="수정 높이" placeholder="높이(cm)" value={editForm.height_cm} onChange={setEdit('height_cm')} />
+                  <div className="edit-actions">
+                    <button type="submit">저장</button>
+                    <button type="button" className="btn-ghost" onClick={cancelEdit}>취소</button>
+                  </div>
+                </form>
+              )}
             </div>
           );
         })}

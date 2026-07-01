@@ -4,6 +4,7 @@ import { api } from '../api.js';
 import { cmToPx, pxToCm, snapCm, rotatedFootprint, nextRotation } from '../geometry.js';
 import { catKey, catColor, CATEGORY_META } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
+import { Tabs } from '../Tabs.jsx';
 
 const MARGIN_CM = 60;
 
@@ -86,7 +87,7 @@ export function LayoutPage() {
   if (!layout) {
     return (
       <main className="container">
-        <Link to="/">← 목록</Link>
+        <Tabs />
         {error && <p className="error">{error}</p>}
       </main>
     );
@@ -100,7 +101,7 @@ export function LayoutPage() {
 
   return (
     <main className="container">
-      <Link to="/">← 목록</Link>
+      <Tabs />
       <header className="page-head">
         <p className="eyebrow">우리 집 도면</p>
         <h1 className="display">평면도 배치</h1>
