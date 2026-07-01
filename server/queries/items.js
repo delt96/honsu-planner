@@ -56,6 +56,24 @@ export async function deleteItem(pool, id) {
   return rowCount > 0;
 }
 
+export async function setConfirmed(pool, itemId, candidateId) {
+  const { rows } = await pool.query(
+    `UPDATE items SET confirmed_candidate_id = $2
+     WHERE id = $1 AND $2 IN (SELECT id FROM candidates WHERE item_id = $1)
+     RETURNING *`,
+    [itemId, candidateId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function clearConfirmed(pool, itemId) {
+  const { rows } = await pool.query(
+    'UPDATE items SET confirmed_candidate_id = NULL WHERE id = $1 RETURNING *',
+    [itemId]
+  );
+  return rows[0] ?? null;
+}
+
 export function normalizeCandidateRow(r) {
   return {
     ...r,

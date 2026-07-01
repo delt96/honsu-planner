@@ -48,5 +48,28 @@ export function itemsRouter(pool) {
     } catch (e) { next(e); }
   });
 
+  r.put('/items/:id/confirm', async (req, res, next) => {
+    try {
+      const itemId = Number(req.params.id);
+      const candidateId = Number(req.body?.candidate_id);
+      if (!Number.isInteger(candidateId)) {
+        return res.status(400).json({ error: 'candidate_id is required' });
+      }
+      const item = await items.getItem(pool, itemId);
+      if (!item) return res.status(404).json({ error: 'Item not found' });
+      const updated = await items.setConfirmed(pool, itemId, candidateId);
+      if (!updated) return res.status(400).json({ error: 'Candidate does not belong to this item' });
+      res.json(updated);
+    } catch (e) { next(e); }
+  });
+
+  r.delete('/items/:id/confirm', async (req, res, next) => {
+    try {
+      const updated = await items.clearConfirmed(pool, Number(req.params.id));
+      if (!updated) return res.status(404).json({ error: 'Item not found' });
+      res.json(updated);
+    } catch (e) { next(e); }
+  });
+
   return r;
 }
