@@ -43,7 +43,7 @@ export function normalizeCandidate(body, { partial = false } = {}) {
     }
   }
 
-  for (const key of ['url', 'memo']) {
+  for (const key of ['brand', 'url', 'memo']) {
     if (body[key] !== undefined) out[key] = body[key] === '' ? null : String(body[key]);
   }
 

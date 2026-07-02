@@ -127,7 +127,9 @@ body {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   margin-top: 9px; font: 500 12px var(--sans); color: var(--ink-3);
 }
-.budget-pct { color: var(--rose); font-weight: 700; }
+.budget-remain { color: var(--ink-2); font-weight: 600; }
+.budget-over { color: var(--danger); font-weight: 700; }
+.progress-fill.over { background: var(--danger); }
 .target-btn {
   background: none; border: none; box-shadow: none; padding: 4px 6px; margin: -4px -6px;
   font: 500 12px var(--sans); color: var(--ink-3); cursor: pointer; border-radius: var(--r-xs);
@@ -230,6 +232,7 @@ button:active { transform: translateY(1px); }
 .cand-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .cand-name { font: 700 16px var(--sans); color: var(--ink); }
 .cheapest-chip { font: 700 10.5px var(--sans); color: var(--teal); background: var(--teal-soft2); border-radius: var(--pill); padding: 4px 8px; }
+.cand-brand { font: 700 10.5px var(--sans); color: var(--rose-deep); background: var(--rose-soft); border-radius: var(--pill); padding: 4px 8px; }
 .cand-price { flex: none; font: 700 19px var(--num); color: var(--ink); }
 .cand-price.price-conf { color: var(--rose-deep); }
 .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 11px 0 0; }

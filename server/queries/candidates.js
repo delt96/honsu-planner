@@ -1,6 +1,6 @@
 import { normalizeCandidateRow } from './items.js';
 
-const COLS = ['name', 'price', 'url', 'memo', 'width_cm', 'depth_cm', 'height_cm'];
+const COLS = ['name', 'brand', 'price', 'url', 'memo', 'width_cm', 'depth_cm', 'height_cm'];
 
 export async function getCandidate(pool, id) {
   const { rows } = await pool.query('SELECT * FROM candidates WHERE id = $1', [id]);
@@ -9,10 +9,10 @@ export async function getCandidate(pool, id) {
 
 export async function createCandidate(pool, itemId, value) {
   const { rows } = await pool.query(
-    `INSERT INTO candidates (item_id, name, price, url, memo, width_cm, depth_cm, height_cm)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+    `INSERT INTO candidates (item_id, name, brand, price, url, memo, width_cm, depth_cm, height_cm)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
     [
-      itemId, value.name, value.price ?? null, value.url ?? null, value.memo ?? null,
+      itemId, value.name, value.brand ?? null, value.price ?? null, value.url ?? null, value.memo ?? null,
       value.width_cm ?? null, value.depth_cm ?? null, value.height_cm ?? null,
     ]
   );

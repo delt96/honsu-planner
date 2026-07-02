@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api.js';
-import { won } from '../format.js';
+import { won, commas, digitsOnly } from '../format.js';
 import { catKey, catColor, catSoft, catLabel } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
 import { CarryInBadge } from '../CarryInBadge.jsx';
 
-const EMPTY = { name: '', price: '', url: '', memo: '', width_cm: '', depth_cm: '', height_cm: '' };
+const EMPTY = { name: '', brand: '', price: '', url: '', memo: '', width_cm: '', depth_cm: '', height_cm: '' };
 
 function editValues(c) {
   return {
-    name: c.name ?? '', price: c.price ?? '', url: c.url ?? '', memo: c.memo ?? '',
+    name: c.name ?? '', brand: c.brand ?? '', price: c.price ?? '', url: c.url ?? '', memo: c.memo ?? '',
     width_cm: c.width_cm ?? '', depth_cm: c.depth_cm ?? '', height_cm: c.height_cm ?? '',
   };
 }
@@ -70,6 +70,8 @@ export function ItemDetailPage() {
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const setEdit = (k) => (e) => setEditForm({ ...editForm, [k]: e.target.value });
+  const setPrice = (e) => setForm({ ...form, price: digitsOnly(e.target.value) });
+  const setEditPrice = (e) => setEditForm({ ...editForm, price: digitsOnly(e.target.value) });
   const key = catKey(item.category);
 
   const priced = item.candidates.filter((c) => c.price != null);
@@ -142,6 +144,7 @@ export function ItemDetailPage() {
               {isConfirmed && <span className="conf-pill">✓ 확정된 후보</span>}
               <div className="cand-top">
                 <div className="cand-title">
+                  {c.brand && <span className="cand-brand">{c.brand}</span>}
                   <span className="cand-name">{c.name}</span>
                   {isCheapest && <span className="cheapest-chip">최저가</span>}
                 </div>
@@ -167,7 +170,8 @@ export function ItemDetailPage() {
               {editId === c.id && (
                 <form onSubmit={saveEdit} className="cand-edit">
                   <input aria-label="수정 이름" placeholder="이름" value={editForm.name} onChange={setEdit('name')} />
-                  <input aria-label="수정 가격" placeholder="가격(원)" value={editForm.price} onChange={setEdit('price')} />
+                  <input aria-label="수정 브랜드" placeholder="브랜드" value={editForm.brand} onChange={setEdit('brand')} />
+                  <input aria-label="수정 가격" inputMode="numeric" placeholder="가격(원)" value={commas(editForm.price)} onChange={setEditPrice} />
                   <input aria-label="수정 URL" placeholder="URL" value={editForm.url} onChange={setEdit('url')} />
                   <input aria-label="수정 메모" placeholder="메모" value={editForm.memo} onChange={setEdit('memo')} />
                   <input aria-label="수정 가로" placeholder="가로(cm)" value={editForm.width_cm} onChange={setEdit('width_cm')} />
@@ -187,7 +191,8 @@ export function ItemDetailPage() {
       <form onSubmit={addCandidate} className="cand-form">
         <h2>후보 추가</h2>
         <input aria-label="후보 이름" placeholder="이름" value={form.name} onChange={set('name')} />
-        <input aria-label="가격" placeholder="가격(원)" value={form.price} onChange={set('price')} />
+        <input aria-label="브랜드" placeholder="브랜드(예: 삼성)" value={form.brand} onChange={set('brand')} />
+        <input aria-label="가격" inputMode="numeric" placeholder="가격(원)" value={commas(form.price)} onChange={setPrice} />
         <input aria-label="URL" placeholder="URL" value={form.url} onChange={set('url')} />
         <input aria-label="메모" placeholder="메모" value={form.memo} onChange={set('memo')} />
         <input aria-label="가로" placeholder="가로(cm)" value={form.width_cm} onChange={set('width_cm')} />

@@ -77,6 +77,8 @@ export function HomePage() {
   const confirmedTotal = summary?.confirmed_total ?? 0;
   const pct = target > 0 ? Math.min(100, Math.round((confirmedTotal / target) * 100)) : 0;
   const remaining = Math.max(0, target - confirmedTotal);
+  const over = Math.max(0, confirmedTotal - target);
+  const overBudget = confirmedTotal > target;
 
   return (
     <main className="container home">
@@ -96,22 +98,28 @@ export function HomePage() {
               <span className="pill pill-gray">비교중 {comparing.length}</span>
             </div>
           </div>
-          <div className="progress"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>
+          <div className="progress">
+            <div className={`progress-fill${overBudget ? ' over' : ''}`} style={{ width: `${pct}%` }} />
+          </div>
           <div className="budget-foot">
-            <span className="budget-pct">{pct}% 달성</span>
+            {overBudget ? (
+              <span className="budget-over">한도 초과 <span className="num">+{won(over)}</span></span>
+            ) : (
+              <span className="budget-remain">남은 예산 <span className="num">{won(remaining)}</span></span>
+            )}
             {editingTarget ? (
               <input
                 className="target-input num"
                 type="number"
                 defaultValue={target}
-                aria-label="목표 예산"
+                aria-label="예산 한도"
                 autoFocus
                 onBlur={(e) => saveTarget(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') saveTarget(e.target.value); }}
               />
             ) : (
               <button type="button" className="target-btn" onClick={() => setEditingTarget(true)}>
-                목표 <span className="num">{won(target)}</span> · 남은 <span className="num">{won(remaining)}</span>
+                한도 <span className="num">{won(target)}</span>
               </button>
             )}
           </div>

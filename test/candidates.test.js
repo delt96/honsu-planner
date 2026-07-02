@@ -18,6 +18,16 @@ test('POST candidate with full fields', async () => {
   expect(res.body).toMatchObject({ name: 'LG 냉장고', price: 1200000, width_cm: 91.2 });
 });
 
+test('POST candidate stores brand, and PATCH can update it', async () => {
+  const { app } = createTestApp();
+  const id = await makeItem(app);
+  const c = await request(app).post(`/api/items/${id}/candidates`).send({ name: '비스포크', brand: '삼성' });
+  expect(c.status).toBe(201);
+  expect(c.body.brand).toBe('삼성');
+  const patched = await request(app).patch(`/api/candidates/${c.body.id}`).send({ brand: 'LG' });
+  expect(patched.body.brand).toBe('LG');
+});
+
 test('POST candidate allows optional fields to be omitted', async () => {
   const { app } = createTestApp();
   const id = await makeItem(app);
