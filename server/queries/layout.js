@@ -1,7 +1,11 @@
 import { listRooms } from './rooms.js';
+import { listFeatures } from './room-features.js';
 
 export async function getLayout(pool) {
-  const rooms = await listRooms(pool);
+  const [roomRows, features] = await Promise.all([listRooms(pool), listFeatures(pool)]);
+  const byRoom = new Map(roomRows.map((r) => [r.id, []]));
+  for (const f of features) byRoom.get(f.room_id)?.push(f);
+  const rooms = roomRows.map((r) => ({ ...r, features: byRoom.get(r.id) }));
   const { rows } = await pool.query(
     `SELECT i.id AS item_id, i.name, i.category,
             c.width_cm, c.depth_cm,

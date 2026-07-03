@@ -39,3 +39,16 @@ test('categorizes rooms, palette, placements, unplaceable', async () => {
     { item_id: expect.any(Number), name: '스탠드', category: null },
   ]);
 });
+
+test('layout rooms include ceiling height and wall features', async () => {
+  const { app } = createTestApp();
+  const room = (await request(app).post('/api/rooms').send({ name: '안방', width_cm: 350, depth_cm: 300 })).body;
+  await request(app).patch(`/api/rooms/${room.id}`).send({ ceiling_height_cm: 235 });
+  await request(app).post(`/api/rooms/${room.id}/features`)
+    .send({ kind: 'door', wall: 'S', offset_cm: 30, width_cm: 80, height_cm: 204, swing: 'in-left' });
+  const res = await request(app).get('/api/layout');
+  expect(res.body.rooms[0].ceiling_height_cm).toBe(235);
+  expect(res.body.rooms[0].features).toEqual([
+    expect.objectContaining({ kind: 'door', wall: 'S', offset_cm: 30, width_cm: 80 }),
+  ]);
+});
