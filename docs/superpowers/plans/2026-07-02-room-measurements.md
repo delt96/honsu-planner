@@ -14,7 +14,8 @@
 - 치수는 전부 cm(소수 허용), DB 컬럼은 `numeric`. SQL은 pg-mem 호환 범위만 (CHECK 제약·enum 타입 금지 — 기존 마이그레이션과 동일 스타일).
 - 새 검증 에러 메시지는 한글 (스펙 §9). 기존 영어 메시지는 건드리지 않는다.
 - UI 문구는 한글. 카테고리 등 코드 값은 영문 그대로.
-- **작업 트리에 이번 작업과 무관한 미커밋 변경(budget_limit 관련)이 있다.** 커밋 시 반드시 자기 태스크의 파일만 `git add <경로>`로 지정한다. `git add -A`, `git add .` 절대 금지.
+- **마이그레이션 번호:** 커밋된 마이그레이션은 현재 001~005다. **006은 다른 세션에서 진행 중인 budget_limit 작업에 예약**되어 있으므로 이 계획은 007·008을 사용한다(번호 공백은 러너가 파일명 정렬로 처리하므로 무해). budget_limit 관련 코드(`HOME_SETTING_COLS`의 `'budget_limit'` 등)는 아직 master에 없다 — 이 계획의 스니펫에 포함하지 않는다.
+- 커밋 시 반드시 자기 태스크의 파일만 `git add <경로>`로 지정한다. `git add -A`, `git add .` 절대 금지.
 - 테스트 실행: 단일 파일은 `npx vitest run <경로>`, 전체는 `npm test`.
 - offset 0점 규약 (전 태스크 공통): N/S 벽 = 서쪽(왼쪽) 모서리, E/W 벽 = 북쪽(위) 모서리. 벽 길이는 N/S = `width_cm`, E/W = `depth_cm`.
 
@@ -78,7 +79,6 @@ export const HOME_SETTING_COLS = [
   'elevator_car_width_cm',
   'elevator_car_depth_cm',
   'elevator_car_height_cm',
-  'budget_limit',
 ];
 ```
 
@@ -95,13 +95,12 @@ const HOME_SETTING_FIELDS = [
   'elevator_car_width_cm',
   'elevator_car_depth_cm',
   'elevator_car_height_cm',
-  'budget_limit',
 ];
 ```
 
 - [ ] **Step 5: migrate.test.js의 파일 목록 갱신**
 
-`test/migrate.test.js`에는 마이그레이션 파일명을 검증하는 곳이 3곳 있다. 두 `toEqual([...])` 배열 각각의 끝에 `'007_room_door.sql',` 추가, `expect(rows).toHaveLength(6)`을 `toHaveLength(7)`로 변경.
+`test/migrate.test.js`에는 마이그레이션 파일명을 검증하는 곳이 3곳 있다. 두 `toEqual([...])` 배열 각각의 끝(`'005_candidate_brand.sql',` 다음)에 `'007_room_door.sql',` 추가, `expect(rows).toHaveLength(5)`를 `toHaveLength(6)`으로 변경. (006은 예약 번호라 목록에 없는 게 정상.)
 
 - [ ] **Step 6: 테스트 통과 확인**
 
@@ -376,7 +375,7 @@ export function normalizeRoomRow(r) {
 
 - [ ] **Step 5: migrate.test.js의 파일 목록 갱신**
 
-두 `toEqual([...])` 배열 끝에 `'008_room_measurements.sql',` 추가, `toHaveLength(7)`을 `toHaveLength(8)`로 변경.
+두 `toEqual([...])` 배열 끝에 `'008_room_measurements.sql',` 추가, `toHaveLength(6)`을 `toHaveLength(7)`로 변경.
 
 - [ ] **Step 6: 테스트 통과 확인**
 
@@ -1688,10 +1687,10 @@ export function CeilingBadge({ heightCm, settings }) {
 Run: `npx vitest run web/src/CeilingBadge.test.jsx web/src/pages/HomePage.test.jsx web/src/pages/ItemDetailPage.test.jsx`
 Expected: 전부 PASS.
 
-- [ ] **Step 5: 전체 테스트**
+- [ ] **Step 5: 전체 테스트 + 빌드 검증**
 
-Run: `npm test`
-Expected: 전체 스위트 PASS. 실패가 있으면 원인을 고치고 나서 커밋.
+Run: `npm test` (백엔드), `cd web && npm test` (프론트), `cd web && npm run build`
+Expected: 두 스위트 전체 PASS, `web/dist/` 빌드 오류 없음. 실패가 있으면 원인을 고치고 나서 커밋.
 
 - [ ] **Step 6: Commit**
 
