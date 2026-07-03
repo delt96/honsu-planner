@@ -35,3 +35,14 @@ test('adds an item and reloads', async () => {
   await userEvent.click(screen.getByText('＋ 추가'));
   await waitFor(() => expect(api.createItem).toHaveBeenCalledWith('소파', 'furniture'));
 });
+
+test('shows 천장 초과 when a confirmed item is taller than the lowest ceiling', async () => {
+  api.getSummary.mockResolvedValue({ confirmed_total: 500000, unconfirmed_count: 0 });
+  api.getHomeSettings.mockResolvedValue({ id: 1, budget_limit: null, min_ceiling_height_cm: 235 });
+  api.listItems.mockResolvedValue([
+    { id: 1, name: '장롱', category: 'furniture', confirmed_candidate_id: 9, confirmed_name: '한샘',
+      confirmed_price: 500000, confirmed_height_cm: 250, candidate_count: 1 },
+  ]);
+  render(<MemoryRouter><HomePage /></MemoryRouter>);
+  expect(await screen.findByText('천장 초과')).toBeInTheDocument();
+});

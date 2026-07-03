@@ -5,6 +5,7 @@ import { won, commas, digitsOnly } from '../format.js';
 import { catKey, catColor, catSoft, catLabel } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
 import { CarryInBadge } from '../CarryInBadge.jsx';
+import { CeilingBadge } from '../CeilingBadge.jsx';
 
 const EMPTY = { name: '', brand: '', price: '', url: '', memo: '', width_cm: '', depth_cm: '', height_cm: '' };
 
@@ -161,7 +162,10 @@ export function ItemDetailPage() {
               </div>
               {d && <div className="chip-row"><span className="spec-chip num">{d}</span></div>}
               {isConfirmed && (
-                <div className="chip-row"><CarryInBadge dims={c} settings={settings} showReason /></div>
+                <div className="chip-row">
+                  <CarryInBadge dims={c} settings={settings} showReason />
+                  <CeilingBadge heightCm={c.height_cm} settings={settings} />
+                </div>
               )}
               {c.memo && <p className="cand-memo">{c.memo}</p>}
               <div className="cand-actions">

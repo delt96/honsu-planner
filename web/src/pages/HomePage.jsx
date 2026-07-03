@@ -5,6 +5,7 @@ import { won } from '../format.js';
 import { catKey, catColor, catSoft, catLabel } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
 import { CarryInBadge } from '../CarryInBadge.jsx';
+import { CeilingBadge } from '../CeilingBadge.jsx';
 import { Tabs } from '../Tabs.jsx';
 
 const TARGET_KEY = 'honsu_budget_target';
@@ -190,6 +191,7 @@ export function HomePage() {
                   settings={settings}
                   hideUnknown
                 />
+                <CeilingBadge heightCm={it.confirmed_height_cm} settings={settings} />
                 <div className="confirmed-price num">{won(it.confirmed_price)}</div>
               </Link>
             ))}
