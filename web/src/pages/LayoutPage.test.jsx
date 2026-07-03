@@ -10,6 +10,7 @@ vi.mock('../api.js', () => ({
     getLayout: vi.fn(), createRoom: vi.fn(), deleteRoom: vi.fn(),
     placeItem: vi.fn(), unplaceItem: vi.fn(), updateRoom: vi.fn(),
     getHomeSettings: vi.fn(), saveHomeSettings: vi.fn(),
+    createFeature: vi.fn(), updateFeature: vi.fn(), deleteFeature: vi.fn(),
   },
 }));
 
@@ -95,4 +96,20 @@ test('dragging furniture persists via placeItem keeping rotation', async () => {
   fireEvent.mouseMove(svg, { clientX: 0, clientY: 60 });
   fireEvent.mouseUp(svg, { clientX: 0, clientY: 60 });
   await waitFor(() => expect(api.placeItem).toHaveBeenCalledWith(5, { x: 10, y: 120, rotation: 0 }));
+});
+
+test('room card lists features and saves ceiling height', async () => {
+  api.getLayout.mockResolvedValue({
+    rooms: [{ id: 1, name: '거실', x: 0, y: 0, width_cm: 400, depth_cm: 500, ceiling_height_cm: null, features: [
+      { id: 11, kind: 'outlet', wall: 'E', offset_cm: 150, width_cm: null, height_cm: null, sill_height_cm: null, floor_height_cm: 30, swing: null },
+    ] }],
+    placements: [], palette: [], unplaceable: [],
+  });
+  api.updateRoom.mockResolvedValue({});
+  render(<MemoryRouter><LayoutPage /></MemoryRouter>);
+  expect(await screen.findByText('동쪽 · 모서리 150cm · 바닥 30cm')).toBeInTheDocument();
+  const inp = screen.getByLabelText('거실 천장 높이');
+  await userEvent.type(inp, '240');
+  await userEvent.tab();
+  await waitFor(() => expect(api.updateRoom).toHaveBeenCalledWith(1, { ceiling_height_cm: '240' }));
 });

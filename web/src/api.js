@@ -38,4 +38,7 @@ export const api = {
   unplaceItem: (itemId) => req(`/items/${itemId}/placement`, { method: 'DELETE' }),
   getHomeSettings: () => req('/home-settings'),
   saveHomeSettings: (data) => req('/home-settings', { method: 'PUT', body: JSON.stringify(data) }),
+  createFeature: (roomId, data) => req(`/rooms/${roomId}/features`, { method: 'POST', body: JSON.stringify(data) }),
+  updateFeature: (id, data) => req(`/features/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteFeature: (id) => req(`/features/${id}`, { method: 'DELETE' }),
 };

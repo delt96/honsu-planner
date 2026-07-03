@@ -5,6 +5,7 @@ import { cmToPx, pxToCm, snapCm, rotatedFootprint, nextRotation } from '../geome
 import { catKey, catColor, CATEGORY_META } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
 import { Tabs } from '../Tabs.jsx';
+import { RoomCard } from '../RoomCard.jsx';
 
 const MARGIN_CM = 60;
 
@@ -28,6 +29,8 @@ export function LayoutPage() {
   const [error, setError] = useState(null);
   const [room, setRoom] = useState({ name: '', width_cm: '', depth_cm: '' });
   const [drag, setDrag] = useState(null); // { kind:'room'|'item', id, startX, startY, dxCm, dyCm }
+  const [selectedFeature, setSelectedFeature] = useState(null);
+  const selectFeature = (id) => setSelectedFeature((cur) => (cur === id ? null : id));
 
   function startDrag(kind, id, e) {
     e.preventDefault();
@@ -183,15 +186,13 @@ export function LayoutPage() {
                 onChange={(e) => setRoom({ ...room, depth_cm: e.target.value })} />
               <button type="submit">방 추가</button>
             </form>
-            <ul className="mini-list" data-testid="room-list">
+            <div data-testid="room-list">
               {rooms.map((r) => (
-                <li key={r.id}>
-                  <span className="mini-name">{r.name} ({r.width_cm}×{r.depth_cm})</span>
-                  <button className="danger" onClick={() => removeRoom(r.id)}>삭제</button>
-                </li>
+                <RoomCard key={r.id} room={r} onChanged={load} onDelete={() => removeRoom(r.id)}
+                  selectedId={selectedFeature} onSelect={selectFeature} />
               ))}
-              {rooms.length === 0 && <li className="muted">아직 방이 없어요</li>}
-            </ul>
+              {rooms.length === 0 && <p className="mini-list muted">아직 방이 없어요</p>}
+            </div>
           </section>
 
           <section>
