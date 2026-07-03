@@ -54,3 +54,20 @@ test('non-numeric room id → 404', async () => {
   const res = await request(app).delete('/api/rooms/abc');
   expect(res.status).toBe(404);
 });
+
+test('PATCH stores a per-room ceiling height and clears it with empty string', async () => {
+  const { app } = createTestApp();
+  const room = await request(app).post('/api/rooms').send({ name: '안방', width_cm: 350, depth_cm: 300 });
+  const res = await request(app).patch(`/api/rooms/${room.body.id}`).send({ ceiling_height_cm: 235 });
+  expect(res.status).toBe(200);
+  expect(res.body.ceiling_height_cm).toBe(235);
+  const cleared = await request(app).patch(`/api/rooms/${room.body.id}`).send({ ceiling_height_cm: '' });
+  expect(cleared.body.ceiling_height_cm).toBeNull();
+});
+
+test('PATCH rejects a non-positive ceiling height', async () => {
+  const { app } = createTestApp();
+  const room = await request(app).post('/api/rooms').send({ name: '안방', width_cm: 350, depth_cm: 300 });
+  const res = await request(app).patch(`/api/rooms/${room.body.id}`).send({ ceiling_height_cm: 0 });
+  expect(res.status).toBe(400);
+});

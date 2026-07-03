@@ -87,6 +87,16 @@ export function normalizeRoomInput(body, { partial = false } = {}) {
     }
   }
 
+  if (body.ceiling_height_cm !== undefined) {
+    if (body.ceiling_height_cm === null || body.ceiling_height_cm === '') {
+      out.ceiling_height_cm = null;
+    } else {
+      const n = Number(body.ceiling_height_cm);
+      if (!(n > 0)) errors.push('ceiling_height_cm must be a positive number');
+      else out.ceiling_height_cm = n;
+    }
+  }
+
   if (body.sort_order !== undefined) {
     const n = Number(body.sort_order);
     if (Number.isFinite(n)) out.sort_order = n;

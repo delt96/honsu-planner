@@ -5,6 +5,8 @@ export function normalizeRoomRow(r) {
     y: Number(r.y),
     width_cm: Number(r.width_cm),
     depth_cm: Number(r.depth_cm),
+    ceiling_height_cm:
+      r.ceiling_height_cm === null || r.ceiling_height_cm === undefined ? null : Number(r.ceiling_height_cm),
   };
 }
 
@@ -27,7 +29,7 @@ export async function createRoom(pool, { name, width_cm, depth_cm, x, y }) {
 }
 
 export async function updateRoom(pool, id, data) {
-  const cols = ['name', 'width_cm', 'depth_cm', 'x', 'y', 'sort_order'];
+  const cols = ['name', 'width_cm', 'depth_cm', 'x', 'y', 'sort_order', 'ceiling_height_cm'];
   const sets = [];
   const vals = [];
   let i = 1;
