@@ -56,6 +56,10 @@ export function evaluateCarryIn(dims, settings) {
   const dh = num(s.door_height_cm);
   if (dw && dh) checks.push({ name: '현관문', ...throughOpening(cross, dw, dh) });
 
+  const rdw = num(s.room_door_width_cm);
+  const rdh = num(s.room_door_height_cm);
+  if (rdw && rdh) checks.push({ name: '방문', ...throughOpening(cross, rdw, rdh) });
+
   const edw = num(s.elevator_door_width_cm);
   const edh = num(s.elevator_door_height_cm);
   if (edw && edh) checks.push({ name: '엘리베이터 문', ...throughOpening(cross, edw, edh) });
