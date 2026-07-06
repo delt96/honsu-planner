@@ -412,3 +412,4 @@ h1.display { font-size: 22px; }
 .feat-sym.selected .door-arc, .feat-sym.selected .win-line { stroke-width: 3; }
 .feat-sym.selected .outlet-dot { stroke: var(--ink); stroke-width: 2; }
 .feat-chip { font: 600 11px var(--num); fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; }
+.dist-label { font: 600 10px var(--num); fill: var(--ink-3); paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; }
