@@ -29,14 +29,3 @@ export function featureSummary(f) {
   if (f.kind === 'outlet' && f.floor_height_cm != null) parts.push(`바닥 ${f.floor_height_cm}cm`);
   return parts.join(' · ');
 }
-
-// Click chip for the floor-plan symbol. Vertical (height) info can't be drawn on a top-down plan, so it's split out here.
-export function featureChip(f) {
-  const parts = [];
-  if (f.width_cm != null) parts.push(`W${f.width_cm}`);
-  if (f.height_cm != null) parts.push(`H${f.height_cm}`);
-  if (f.kind === 'window' && f.sill_height_cm != null) parts.push(`턱${f.sill_height_cm}`);
-  if (f.kind === 'door' && f.swing) parts.push(SWING_LABEL[f.swing]);
-  if (f.kind === 'outlet') parts.push(f.floor_height_cm != null ? `바닥 ${f.floor_height_cm}cm` : '콘센트');
-  return parts.join(' · ');
-}

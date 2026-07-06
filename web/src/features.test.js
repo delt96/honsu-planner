@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { featureSummary, featureChip } from './features.js';
+import { featureSummary } from './features.js';
 
 test('door summary includes wall, offset, size, and swing', () => {
   expect(featureSummary({ kind: 'door', wall: 'S', offset_cm: 30, width_cm: 80, height_cm: 204, swing: 'in-left' }))
@@ -14,13 +14,4 @@ test('window summary includes the sill height', () => {
 test('outlet summary skips size fields', () => {
   expect(featureSummary({ kind: 'outlet', wall: 'E', offset_cm: 150, width_cm: null, height_cm: null, floor_height_cm: 30 }))
     .toBe('동쪽 · 모서리 150cm · 바닥 30cm');
-});
-
-test('window chip shows W·H·턱', () => {
-  expect(featureChip({ kind: 'window', wall: 'N', offset_cm: 90, width_cm: 180, height_cm: 120, sill_height_cm: 90 }))
-    .toBe('W180 · H120 · 턱90');
-});
-
-test('outlet chip shows floor height', () => {
-  expect(featureChip({ kind: 'outlet', wall: 'E', offset_cm: 150, floor_height_cm: 30 })).toBe('바닥 30cm');
 });

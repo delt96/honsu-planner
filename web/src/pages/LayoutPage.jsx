@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
-import { cmToPx, pxToCm, snapCm, rotatedFootprint, nextRotation, nearestWallPoint, clampFeatureOffset } from '../geometry.js';
+import { cmToPx, pxToCm, snapCm, rotatedFootprint, nextRotation, nearestWallPoint, clampFeatureOffset, wallSegment } from '../geometry.js';
 import { catKey, catColor, CATEGORY_META } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
 import { Tabs } from '../Tabs.jsx';
@@ -9,6 +9,7 @@ import { RoomCard } from '../RoomCard.jsx';
 import { FeatureSymbols, FeatureSymbol } from '../FeatureSymbols.jsx';
 import { FeatureToolbar } from '../FeatureToolbar.jsx';
 import { DistanceLabels } from '../DistanceLabels.jsx';
+import { FeaturePropertyCard } from '../FeaturePropertyCard.jsx';
 import { FEATURE_DEFAULTS } from '../features.js';
 
 const MARGIN_CM = 60;
@@ -177,73 +178,87 @@ export function LayoutPage() {
             <FeatureToolbar mode={mode} onToggle={toggleMode} hasRooms={rooms.length > 0} />
             <span className="legend-hint">{mode ? '' : '사각형을 드래그해 배치'}</span>
           </div>
-          <svg
-            className="canvas"
-            width={cw}
-            height={ch}
-            viewBox={`0 0 ${cw} ${ch}`}
-            role="img"
-            aria-label="평면도"
-            onMouseMove={mode ? moveGhost : moveDrag}
-            onMouseUp={endDrag}
-            onMouseLeave={mode ? () => setGhost(null) : undefined}
-            onClick={mode ? placeGhost : undefined}
-          >
-            {rooms.map((r) => {
-              const off = liveOffset('room', r.id);
-              return (
-                <g key={`room-${r.id}`} transform={`translate(${off.dx} ${off.dy})`}>
-                  <rect className="room" data-testid={`room-${r.id}`}
-                    onMouseDown={(e) => startDrag('room', r.id, e)}
-                    x={cmToPx(r.x)} y={cmToPx(r.y)} width={cmToPx(r.width_cm)} height={cmToPx(r.depth_cm)} />
-                  <text x={cmToPx(r.x) + 6} y={cmToPx(r.y) + 16} className="room-label">
-                    {r.name} ({r.width_cm}×{r.depth_cm})
-                  </text>
-                  <FeatureSymbols room={r} selectedId={selectedFeature} onSelect={selectFeature} />
-                </g>
-              );
-            })}
-            {mode && ghost && (() => {
-              const room = rooms.find((r) => r.id === ghost.roomId);
-              const def = FEATURE_DEFAULTS[mode];
-              const fake = {
-                id: 'ghost', kind: mode, wall: ghost.wall, offset_cm: ghost.offset_cm,
-                width_cm: def.width_cm ?? null, swing: def.swing ?? null,
-              };
-              return (
-                <g className={`feat-ghost${ghost.fits ? '' : ' invalid'}`}>
-                  <FeatureSymbol room={room} feature={fake} />
-                  <DistanceLabels room={room} wall={ghost.wall} offsetCm={ghost.offset_cm} widthCm={def.width_cm ?? 0} />
-                </g>
-              );
+          <div className="canvas-stage">
+            <svg
+              className="canvas"
+              width={cw}
+              height={ch}
+              viewBox={`0 0 ${cw} ${ch}`}
+              role="img"
+              aria-label="평면도"
+              onMouseMove={mode ? moveGhost : moveDrag}
+              onMouseUp={endDrag}
+              onMouseLeave={mode ? () => setGhost(null) : undefined}
+              onClick={mode ? placeGhost : () => setSelectedFeature(null)}
+            >
+              {rooms.map((r) => {
+                const off = liveOffset('room', r.id);
+                return (
+                  <g key={`room-${r.id}`} transform={`translate(${off.dx} ${off.dy})`}>
+                    <rect className="room" data-testid={`room-${r.id}`}
+                      onMouseDown={(e) => startDrag('room', r.id, e)}
+                      x={cmToPx(r.x)} y={cmToPx(r.y)} width={cmToPx(r.width_cm)} height={cmToPx(r.depth_cm)} />
+                    <text x={cmToPx(r.x) + 6} y={cmToPx(r.y) + 16} className="room-label">
+                      {r.name} ({r.width_cm}×{r.depth_cm})
+                    </text>
+                    <FeatureSymbols room={r} selectedId={selectedFeature} onSelect={selectFeature} />
+                  </g>
+                );
+              })}
+              {mode && ghost && (() => {
+                const room = rooms.find((r) => r.id === ghost.roomId);
+                const def = FEATURE_DEFAULTS[mode];
+                const fake = {
+                  id: 'ghost', kind: mode, wall: ghost.wall, offset_cm: ghost.offset_cm,
+                  width_cm: def.width_cm ?? null, swing: def.swing ?? null,
+                };
+                return (
+                  <g className={`feat-ghost${ghost.fits ? '' : ' invalid'}`}>
+                    <FeatureSymbol room={room} feature={fake} />
+                    <DistanceLabels room={room} wall={ghost.wall} offsetCm={ghost.offset_cm} widthCm={def.width_cm ?? 0} />
+                  </g>
+                );
+              })()}
+              {placements.map((p) => {
+                const f = rotatedFootprint(p.width_cm, p.depth_cm, p.rotation);
+                const off = liveOffset('item', p.item_id);
+                return (
+                  <g key={`item-${p.item_id}`} transform={`translate(${off.dx} ${off.dy})`}>
+                    <rect className="furniture" data-cat={catKey(p.category)} data-testid={`furn-${p.item_id}`}
+                      onMouseDown={(e) => startDrag('item', p.item_id, e)}
+                      x={cmToPx(p.x)} y={cmToPx(p.y)} width={cmToPx(f.w)} height={cmToPx(f.h)} />
+                    <text x={cmToPx(p.x) + 6} y={cmToPx(p.y) + 16} className="furn-label">{p.name}</text>
+                  </g>
+                );
+              })}
+
+              {/* scale bar — architectural drawing signature */}
+              <g className="scalebar" transform={`translate(14 ${ch - 16})`}>
+                <line x1="0" y1="0" x2={cmToPx(100)} y2="0" />
+                <line x1="0" y1="-4" x2="0" y2="4" />
+                <line x1={cmToPx(100)} y1="-4" x2={cmToPx(100)} y2="4" />
+                <text x={cmToPx(50)} y="-6" textAnchor="middle">1 m</text>
+              </g>
+
+              {isEmpty && (
+                <text className="canvas-empty" x={cw / 2} y={ch / 2} textAnchor="middle">
+                  방을 추가해 평면도를 시작하세요
+                </text>
+              )}
+            </svg>
+            {(() => {
+              for (const r of rooms) {
+                for (const f of r.features ?? []) {
+                  if (f.id !== selectedFeature) continue;
+                  const seg = wallSegment(r, f.wall, Number(f.offset_cm), Number(f.width_cm ?? 0));
+                  const anchor = { x: cmToPx((seg.x1 + seg.x2) / 2) + 14, y: cmToPx((seg.y1 + seg.y2) / 2) + 14 };
+                  return <FeaturePropertyCard key={f.id} feature={f} room={r} anchor={anchor}
+                    onSaved={load} onClose={() => setSelectedFeature(null)} />;
+                }
+              }
+              return null;
             })()}
-            {placements.map((p) => {
-              const f = rotatedFootprint(p.width_cm, p.depth_cm, p.rotation);
-              const off = liveOffset('item', p.item_id);
-              return (
-                <g key={`item-${p.item_id}`} transform={`translate(${off.dx} ${off.dy})`}>
-                  <rect className="furniture" data-cat={catKey(p.category)} data-testid={`furn-${p.item_id}`}
-                    onMouseDown={(e) => startDrag('item', p.item_id, e)}
-                    x={cmToPx(p.x)} y={cmToPx(p.y)} width={cmToPx(f.w)} height={cmToPx(f.h)} />
-                  <text x={cmToPx(p.x) + 6} y={cmToPx(p.y) + 16} className="furn-label">{p.name}</text>
-                </g>
-              );
-            })}
-
-            {/* scale bar — architectural drawing signature */}
-            <g className="scalebar" transform={`translate(14 ${ch - 16})`}>
-              <line x1="0" y1="0" x2={cmToPx(100)} y2="0" />
-              <line x1="0" y1="-4" x2="0" y2="4" />
-              <line x1={cmToPx(100)} y1="-4" x2={cmToPx(100)} y2="4" />
-              <text x={cmToPx(50)} y="-6" textAnchor="middle">1 m</text>
-            </g>
-
-            {isEmpty && (
-              <text className="canvas-empty" x={cw / 2} y={ch / 2} textAnchor="middle">
-                방을 추가해 평면도를 시작하세요
-              </text>
-            )}
-          </svg>
+          </div>
         </div>
 
         <aside className="panel">

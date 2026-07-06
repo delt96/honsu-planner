@@ -114,26 +114,6 @@ test('room card lists features and saves ceiling height', async () => {
   await waitFor(() => expect(api.updateRoom).toHaveBeenCalledWith(1, { ceiling_height_cm: '240' }));
 });
 
-test('renders wall feature symbols and toggles the info chip on click', async () => {
-  api.getLayout.mockResolvedValue({
-    rooms: [{ id: 1, name: '거실', x: 0, y: 0, width_cm: 400, depth_cm: 500, ceiling_height_cm: null, features: [
-      { id: 11, kind: 'window', wall: 'N', offset_cm: 90, width_cm: 180, height_cm: 120, sill_height_cm: 90, floor_height_cm: null, swing: null },
-      { id: 12, kind: 'door', wall: 'S', offset_cm: 30, width_cm: 80, height_cm: 204, sill_height_cm: null, floor_height_cm: null, swing: 'in-left' },
-      { id: 13, kind: 'outlet', wall: 'E', offset_cm: 150, width_cm: null, height_cm: null, sill_height_cm: null, floor_height_cm: 30, swing: null },
-    ] }],
-    placements: [], palette: [], unplaceable: [],
-  });
-  render(<MemoryRouter><LayoutPage /></MemoryRouter>);
-  const win = await screen.findByTestId('feat-11');
-  expect(screen.getByTestId('feat-12')).toBeInTheDocument();
-  expect(screen.getByTestId('feat-13')).toBeInTheDocument();
-  expect(screen.queryByText('W180 · H120 · 턱90')).not.toBeInTheDocument();
-  fireEvent.click(win);
-  expect(screen.getByText('W180 · H120 · 턱90')).toBeInTheDocument();
-  fireEvent.click(win); // clicking again closes the chip
-  expect(screen.queryByText('W180 · H120 · 턱90')).not.toBeInTheDocument();
-});
-
 test('클릭 배치: 도구 선택 → 유령 표시 → 벽 클릭 → 기본치수로 생성', async () => {
   api.getLayout.mockResolvedValue(LAYOUT);
   api.createFeature.mockResolvedValue({ id: 42 });
@@ -190,4 +170,45 @@ test('벽보다 넓은 부착물 유령은 invalid로 표시되고 클릭이 무
   expect(screen.getByTestId('feat-ghost').closest('g.feat-ghost')).toHaveClass('invalid');
   fireEvent.click(svg, { clientX: 18, clientY: 3 });
   expect(api.createFeature).not.toHaveBeenCalled();
+});
+
+const FEAT_LAYOUT = {
+  rooms: [{ id: 1, name: '거실', x: 0, y: 0, width_cm: 400, depth_cm: 500, ceiling_height_cm: null, features: [
+    { id: 11, kind: 'window', wall: 'N', offset_cm: 90, width_cm: 180, height_cm: 120, sill_height_cm: 90, floor_height_cm: null, swing: null },
+    { id: 12, kind: 'door', wall: 'S', offset_cm: 30, width_cm: 80, height_cm: 204, sill_height_cm: null, floor_height_cm: null, swing: 'in-left' },
+  ] }],
+  placements: [], palette: [], unplaceable: [],
+};
+
+test('기호 클릭 → 속성 카드: 오른쪽 모서리 입력이 offset으로 환산 저장된다', async () => {
+  api.getLayout.mockResolvedValue(FEAT_LAYOUT);
+  api.updateFeature.mockResolvedValue({});
+  render(<MemoryRouter><LayoutPage /></MemoryRouter>);
+  fireEvent.click(await screen.findByTestId('feat-11'));
+  const card = screen.getByTestId('feat-card-11');
+  const right = within(card).getByLabelText('오른쪽 모서리에서');
+  expect(right).toHaveValue('130'); // 400 - 90 - 180
+  await userEvent.clear(right);
+  await userEvent.type(right, '100');
+  await userEvent.tab();
+  await waitFor(() => expect(api.updateFeature).toHaveBeenCalledWith(11, { offset_cm: 120 })); // 400 - 180 - 100
+});
+
+test('문 열림 토글은 즉시 저장된다', async () => {
+  api.getLayout.mockResolvedValue(FEAT_LAYOUT);
+  api.updateFeature.mockResolvedValue({});
+  render(<MemoryRouter><LayoutPage /></MemoryRouter>);
+  fireEvent.click(await screen.findByTestId('feat-12'));
+  await userEvent.click(within(screen.getByTestId('feat-card-12')).getByRole('button', { name: '밖' }));
+  await waitFor(() => expect(api.updateFeature).toHaveBeenCalledWith(12, { swing: 'out-left' }));
+});
+
+test('카드의 삭제 버튼이 deleteFeature를 호출하고 카드를 닫는다', async () => {
+  api.getLayout.mockResolvedValue(FEAT_LAYOUT);
+  api.deleteFeature.mockResolvedValue(null);
+  render(<MemoryRouter><LayoutPage /></MemoryRouter>);
+  fireEvent.click(await screen.findByTestId('feat-11'));
+  await userEvent.click(within(screen.getByTestId('feat-card-11')).getByRole('button', { name: '삭제' }));
+  await waitFor(() => expect(api.deleteFeature).toHaveBeenCalledWith(11));
+  expect(screen.queryByTestId('feat-card-11')).not.toBeInTheDocument();
 });

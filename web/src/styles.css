@@ -411,7 +411,6 @@ h1.display { font-size: 22px; }
 .feat-sym .outlet-dot { fill: var(--amber); stroke: #fff; stroke-width: 1; }
 .feat-sym.selected .door-arc, .feat-sym.selected .win-line { stroke-width: 3; }
 .feat-sym.selected .outlet-dot { stroke: var(--ink); stroke-width: 2; }
-.feat-chip { font: 600 11px var(--num); fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; }
 .dist-label { font: 600 10px var(--num); fill: var(--ink-3); paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; }
 
 .feat-toolbar { display: flex; gap: 6px; align-items: center; }
@@ -423,3 +422,16 @@ h1.display { font-size: 22px; }
 .feat-ghost { opacity: 0.55; pointer-events: none; }
 .feat-ghost.invalid .door-arc, .feat-ghost.invalid .win-line { stroke: var(--danger); }
 .feat-ghost.invalid .outlet-dot { fill: var(--danger); }
+
+.canvas-stage { position: relative; }
+
+.feat-card { position: absolute; z-index: 5; width: 210px; background: var(--surface); border-radius: 12px; box-shadow: var(--sh-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font: 500 12px var(--sans); }
+.feat-card-head { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.feat-card-head button { margin-left: auto; flex: none; font: 600 11px var(--sans); min-height: 0; padding: 3px 8px; border-radius: 7px; background: var(--surface-soft2); color: var(--ink-2); }
+.feat-card-head button.danger { background: transparent; color: var(--danger); }
+.feat-card-head button.danger + button { margin-left: 0; }
+.feat-card label { display: flex; align-items: center; justify-content: space-between; gap: 6px; color: var(--ink-3); }
+.feat-card input { width: 70px; min-height: 30px; padding: 4px 8px; border-radius: 7px; background: var(--surface-soft); font: 500 12px var(--num); }
+.swing-toggle { display: flex; gap: 4px; }
+.swing-toggle button { flex: 1; min-height: 30px; border-radius: 7px; background: var(--surface-soft2); font: 600 11.5px var(--sans); color: var(--ink-2); }
+.swing-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }

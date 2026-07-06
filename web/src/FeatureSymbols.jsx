@@ -1,5 +1,4 @@
 import { cmToPx, wallSegment, doorArcPath } from './geometry.js';
-import { featureChip } from './features.js';
 
 // Single wall-attachment symbol: door = wall gap + swing arc, window = double
 // line on the wall, outlet = dot. Reused by the placement ghost (Task 4).
@@ -37,21 +36,10 @@ export function FeatureSymbol({ room, feature: f, selected = false, onClick, onM
   );
 }
 
-// A room's attachments plus the selected feature's info chip (chip is replaced
-// by the property card in a later task).
+// A room's attachments. Selection/click handling is owned by LayoutPage.
 export function FeatureSymbols({ room, selectedId = null, onSelect = () => {} }) {
-  return (room.features ?? []).map((f) => {
-    const seg = wallSegment(room, f.wall, Number(f.offset_cm), Number(f.width_cm ?? 0));
-    const selected = selectedId === f.id;
-    return (
-      <g key={f.id}>
-        <FeatureSymbol room={room} feature={f} selected={selected} onClick={() => onSelect(f.id)} />
-        {selected && (
-          <text className="feat-chip" x={cmToPx((seg.x1 + seg.x2) / 2)} y={cmToPx((seg.y1 + seg.y2) / 2) - 10} textAnchor="middle">
-            {featureChip(f)}
-          </text>
-        )}
-      </g>
-    );
-  });
+  return (room.features ?? []).map((f) => (
+    <FeatureSymbol key={f.id} room={room} feature={f} selected={selectedId === f.id}
+      onClick={(e) => { e.stopPropagation(); onSelect(f.id); }} />
+  ));
 }
