@@ -22,28 +22,6 @@ test('lists existing features with a one-line summary', () => {
   expect(screen.getByText('남쪽 · 모서리 30cm · 폭80 · 높이204 · 안·좌')).toBeInTheDocument();
 });
 
-test('＋문 opens a door form and submits kind + fields', async () => {
-  api.createFeature.mockResolvedValue({});
-  const onChanged = vi.fn();
-  render(<RoomCard room={ROOM} onChanged={onChanged} onDelete={vi.fn()} />);
-  await userEvent.click(screen.getByRole('button', { name: '＋ 문' }));
-  await userEvent.selectOptions(screen.getByLabelText('벽'), 'S');
-  await userEvent.type(screen.getByLabelText('모서리에서'), '30');
-  await userEvent.type(screen.getByLabelText('폭'), '80');
-  await userEvent.selectOptions(screen.getByLabelText('열림'), 'in-left');
-  await userEvent.click(screen.getByRole('button', { name: '저장' }));
-  await waitFor(() => expect(api.createFeature).toHaveBeenCalledWith(1,
-    expect.objectContaining({ kind: 'door', wall: 'S', offset_cm: '30', width_cm: '80', swing: 'in-left' })));
-  expect(onChanged).toHaveBeenCalled();
-});
-
-test('콘센트 form has no width field but has a floor-height field', async () => {
-  render(<RoomCard room={ROOM} onChanged={vi.fn()} onDelete={vi.fn()} />);
-  await userEvent.click(screen.getByRole('button', { name: '＋ 콘센트' }));
-  expect(screen.queryByLabelText('폭')).not.toBeInTheDocument();
-  expect(screen.getByLabelText('바닥에서')).toBeInTheDocument();
-});
-
 test('ceiling blur saves via updateRoom', async () => {
   api.updateRoom.mockResolvedValue({});
   render(<RoomCard room={ROOM} onChanged={vi.fn()} onDelete={vi.fn()} />);
@@ -53,22 +31,23 @@ test('ceiling blur saves via updateRoom', async () => {
   await waitFor(() => expect(api.updateRoom).toHaveBeenCalledWith(1, { ceiling_height_cm: '235' }));
 });
 
-test('수정 opens a pre-filled form and PATCHes', async () => {
-  api.updateFeature.mockResolvedValue({});
-  render(<RoomCard room={ROOM} onChanged={vi.fn()} onDelete={vi.fn()} />);
-  await userEvent.click(screen.getByRole('button', { name: '수정' }));
-  const off = screen.getByLabelText('모서리에서');
-  expect(off).toHaveValue('30');
-  await userEvent.clear(off);
-  await userEvent.type(off, '40');
-  await userEvent.click(screen.getByRole('button', { name: '저장' }));
-  await waitFor(() => expect(api.updateFeature).toHaveBeenCalledWith(11, expect.objectContaining({ offset_cm: '40' })));
-});
-
 test('삭제 calls deleteFeature', async () => {
   api.deleteFeature.mockResolvedValue(null);
   const onChanged = vi.fn();
   render(<RoomCard room={ROOM} onChanged={onChanged} onDelete={vi.fn()} />);
   await userEvent.click(screen.getByRole('button', { name: '부착물 삭제 11' }));
   await waitFor(() => expect(api.deleteFeature).toHaveBeenCalledWith(11));
+});
+
+test('부착물 행 클릭은 onSelect로 도면 선택을 위임한다', async () => {
+  const onSelect = vi.fn();
+  render(<RoomCard room={ROOM} onChanged={vi.fn()} onDelete={vi.fn()} onSelect={onSelect} />);
+  await userEvent.click(screen.getByText('남쪽 · 모서리 30cm · 폭80 · 높이204 · 안·좌'));
+  expect(onSelect).toHaveBeenCalledWith(11);
+});
+
+test('추가/수정 폼은 더 이상 없다', () => {
+  render(<RoomCard room={ROOM} onChanged={vi.fn()} onDelete={vi.fn()} />);
+  expect(screen.queryByRole('button', { name: '＋ 문' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '수정' })).not.toBeInTheDocument();
 });
