@@ -244,3 +244,22 @@ test('3px 미만 이동은 드래그가 아니라 선택 토글이다', async ()
   fireEvent.mouseUp(sym, { clientX: 100, clientY: 0 });
   expect(screen.queryByTestId('feat-card-11')).not.toBeInTheDocument();
 });
+
+test('방 드래그: 이웃 방에 자석 스냅되고 가이드라인이 보인다', async () => {
+  api.getLayout.mockResolvedValue({
+    rooms: [
+      { id: 1, name: '거실', x: 0, y: 0, width_cm: 400, depth_cm: 500 },
+      { id: 2, name: '침실', x: 600, y: 0, width_cm: 300, depth_cm: 300 },
+    ],
+    placements: [], palette: [], unplaceable: [],
+  });
+  api.updateRoom.mockResolvedValue({});
+  const { container } = render(<MemoryRouter><LayoutPage /></MemoryRouter>);
+  const rect = await screen.findByTestId('room-2');
+  const svg = screen.getByRole('img', { name: '평면도' });
+  fireEvent.mouseDown(rect, { clientX: 0, clientY: 0 });
+  fireEvent.mouseMove(svg, { clientX: -117, clientY: 0 }); // proposed x = 600-195 = 405 → magnet 400
+  expect(container.querySelectorAll('.snap-guide').length).toBeGreaterThan(0);
+  fireEvent.mouseUp(svg, { clientX: -117, clientY: 0 });
+  await waitFor(() => expect(api.updateRoom).toHaveBeenCalledWith(2, { x: 400, y: 0 }));
+});

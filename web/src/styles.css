@@ -295,6 +295,7 @@ h1.display { font-size: 22px; }
 .furniture[data-cat='uncategorized'] { fill: #e9e7f1; stroke: var(--ink-4); }
 .furn-label { font: 700 11px var(--sans); fill: var(--ink); }
 .room-label, .furn-label { paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; }
+.snap-guide { stroke: #3b82f6; stroke-width: 1.5; stroke-dasharray: 5 4; }
 .scalebar line { stroke: var(--ink-5); stroke-width: 1; }
 .scalebar text { font: 400 10px var(--num); fill: var(--ink-5); }
 .canvas-empty { font: 500 15px var(--sans); fill: var(--ink-4); }

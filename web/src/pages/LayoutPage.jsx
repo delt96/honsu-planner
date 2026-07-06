@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
-import { cmToPx, pxToCm, snapCm, rotatedFootprint, nextRotation, nearestWallPoint, clampFeatureOffset, wallSegment } from '../geometry.js';
+import { cmToPx, pxToCm, snapCm, rotatedFootprint, nextRotation, nearestWallPoint, clampFeatureOffset, wallSegment, snapRoomPosition } from '../geometry.js';
 import { catKey, catColor, CATEGORY_META } from '../categories.js';
 import { CategoryIcon } from '../icons.jsx';
 import { Tabs } from '../Tabs.jsx';
@@ -116,20 +116,36 @@ export function LayoutPage() {
     setDrag({ kind, id, startX: e.clientX, startY: e.clientY, dxCm: 0, dyCm: 0 });
   }
   function moveDrag(e) {
-    setDrag((d) => (d ? { ...d, dxCm: pxToCm(e.clientX - d.startX), dyCm: pxToCm(e.clientY - d.startY) } : d));
+    setDrag((d) => {
+      if (!d) return d;
+      const dxCm = pxToCm(e.clientX - d.startX);
+      const dyCm = pxToCm(e.clientY - d.startY);
+      if (d.kind !== 'room') return { ...d, dxCm, dyCm };
+      const r = layout.rooms.find((rm) => rm.id === d.id);
+      const others = layout.rooms.filter((o) => o.id !== d.id);
+      const snap = snapRoomPosition(r, others, Number(r.x) + dxCm, Number(r.y) + dyCm);
+      return { ...d, dxCm: snap.x - Number(r.x), dyCm: snap.y - Number(r.y), guides: snap.guides };
+    });
   }
   async function endDrag(e) {
     if (!drag) return;
-    const ddx = snapCm(pxToCm(e.clientX - drag.startX));
-    const ddy = snapCm(pxToCm(e.clientY - drag.startY));
     const d = drag;
     setDrag(null);
-    if (ddx === 0 && ddy === 0) return;
     try {
       if (d.kind === 'room') {
-        const r = layout.rooms.find((r) => r.id === d.id);
-        await api.updateRoom(d.id, { x: r.x + ddx, y: r.y + ddy });
+        const r = layout.rooms.find((rm) => rm.id === d.id);
+        const others = layout.rooms.filter((o) => o.id !== d.id);
+        const rawX = Number(r.x) + pxToCm(e.clientX - d.startX);
+        const rawY = Number(r.y) + pxToCm(e.clientY - d.startY);
+        const snap = snapRoomPosition(r, others, rawX, rawY);
+        const x = snap.snappedX ? snap.x : Number(r.x) + snapCm(rawX - Number(r.x));
+        const y = snap.snappedY ? snap.y : Number(r.y) + snapCm(rawY - Number(r.y));
+        if (x === Number(r.x) && y === Number(r.y)) return;
+        await api.updateRoom(d.id, { x, y });
       } else {
+        const ddx = snapCm(pxToCm(e.clientX - d.startX));
+        const ddy = snapCm(pxToCm(e.clientY - d.startY));
+        if (ddx === 0 && ddy === 0) return;
         const p = layout.placements.find((p) => p.item_id === d.id);
         await api.placeItem(d.id, { x: p.x + ddx, y: p.y + ddy, rotation: p.rotation });
       }
@@ -276,6 +292,14 @@ export function LayoutPage() {
                   </g>
                 );
               })}
+
+              {drag?.kind === 'room' && drag.guides?.map((g, i) => g.axis === 'x' ? (
+                <line key={i} className="snap-guide"
+                  x1={cmToPx(g.positionCm)} y1={cmToPx(g.fromCm)} x2={cmToPx(g.positionCm)} y2={cmToPx(g.toCm)} />
+              ) : (
+                <line key={i} className="snap-guide"
+                  x1={cmToPx(g.fromCm)} y1={cmToPx(g.positionCm)} x2={cmToPx(g.toCm)} y2={cmToPx(g.positionCm)} />
+              ))}
 
               {/* scale bar — architectural drawing signature */}
               <g className="scalebar" transform={`translate(14 ${ch - 16})`}>
